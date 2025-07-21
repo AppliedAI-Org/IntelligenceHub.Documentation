@@ -157,6 +157,27 @@
         cursor: pointer;
       }
     }
+    .tabs {
+      display: flex;
+      justify-content: center;
+      background-color: var(--bg-alt-color);
+    }
+    .tablinks {
+      padding: 0.5rem 1rem;
+      border: none;
+      background-color: var(--bg-alt-color);
+      cursor: pointer;
+    }
+    .tablinks.active {
+      background-color: var(--bg-color);
+      border-bottom: 2px solid var(--link-color);
+    }
+    .tabcontent {
+      display: none;
+    }
+    .tabcontent.active {
+      display: block;
+    }
   </style>
 </head>
 <body>
@@ -164,14 +185,17 @@
     <button class="menu-toggle" onclick="toggleMenu()">☰</button>
     <h1>The Intelligence Hub</h1>
   </header>
+  <div class="tabs">
+    <button class="tablinks active" onclick="openTab(event, 'managed')">Managed Service</button>
+    <button class="tablinks" onclick="openTab(event, 'selfhosted')">Self Hosted API</button>
+  </div>
+  <div id="managed" class="tabcontent active">
   <nav id="sidebar">
     <h2>Table of Contents</h2>
     <ul>
       <li><a href="#overview">Overview</a></li>
       <li><a href="#features">Features</a></li>
-      <li><a href="#setup">Setup</a></li>
       <li><a href="#authentication">Authentication</a></li>
-      <li><a href="#feature-flags">Feature Flags</a></li>
       <li><a href="#tenant-isolation">Tenant Isolation</a></li>
       <li><a href="#rate-limiting">Rate Limiting</a></li>
       <li><a href="#usage">Usage</a></li>
@@ -226,107 +250,6 @@
         <li><strong>Testing utilities</strong> including unit tests, stress tests, and an AI competency testing module.</li>
       </ol>
     </section>
-
-    <section id="setup">
-      <h2>Setup</h2>
-      <h3>Setup Instructions</h3>
-      <p>This section outlines the steps required to set up the IntelligenceHub repository for local development. IntelligenceHub is a .NET API wrapper for AI services that relies on several external resources including AI service providers, search functionalities, and additional infrastructure.</p>
-      <p>Optional infrastructure can be treated modularly unless otherwise noted, but you should be able to find a free tier available for every piece of infrastructure as well, excluding the LLM hosts, although the Azure OpenAI option is at least a 'pay as you go' model, keeping things exceptionally cheap. A cloud account is needed if you plan to use Azure AI Search or Weaviate Cloud for RAG operations, or if you wish to use Azure OpenAI as your LLM host.</p>
-      <div class="callout">
-        <strong>NOTE:</strong> The application requires several sensitive keys and values to populate the configuration. If you intend to use an associated feature, please be sure to have the relevant keys and endpoint data ready when running the <code>env_setup.py</code> script at <code>IntelligenceHub/IntelligenceHub/infrastructure/env_setup.py</code>. The only required features are an SQL Server connection string, and the API key for at least one LLM host.
-      </div>
-
-      <h4>1. Environment Setup</h4>
-      <ul>
-        <li><strong>Ensure the following are installed</strong>:
-          <ul>
-            <li><a href="https://dotnet.microsoft.com/download">.NET SDK (version 8.0 or later)</a></li>
-            <li><a href="https://www.python.org/downloads/">Python 3.1 or later</a> – for running the appsettings generation script.</li>
-            <li><a href="https://visualstudio.microsoft.com/">Visual Studio 2022</a> is recommended for easiest set up, but technically the Git client should suffice.</li>
-          </ul>
-        </li>
-        <li><strong>Set Up the Repo</strong>:
-          <ol>
-            <li>Open Visual Studio, and select 'clone a repository.'</li>
-            <li>Get the Git repository URL at <a href="https://github.com/Jacob-J-Thomas/IntelligenceHub">https://github.com/Jacob-J-Thomas/IntelligenceHub</a>, and use it to clone the repo.</li>
-          </ol>
-        </li>
-      </ul>
-
-      <h4>2. Create Resource Dependencies</h4>
-      <p><strong>Note:</strong> The repository includes a Python script, <code>IntelligenceHub/infrastructure/env_setup.py</code>, that generates a development configuration file by populating <code>appsettings.Development.json</code> from a template. You may find it worthwhile to save the API keys and URLs associated with these resources so that you can easily enter them into the Python script later.</p>
-      <h5>Essential Resources for Basic Completions</h5>
-      <p>The below resources are the bare minimum requirements to run the API and get a <code>200</code> response from the <code>/Completion/Chat/{profileName}</code> endpoint. If your application requires RAG database operations or app insight telemetry collection, please ensure you follow the associated steps in the optional "Additional Cloud Resources" section.</p>
-      <ul>
-        <li><strong>SQL Database (required)</strong> – The application relies on SQL to store conversation history, completion profiles, and RAG metadata. You can use a local SQL Server instance following the <a href="https://docs.microsoft.com/en-us/sql/database-engine/install-windows/install-sql-server?view=sql-server-ver15">SQL Server Installation Guide</a> (free versions are <a href="https://www.microsoft.com/en-us/sql-server/sql-server-downloads">available here</a>). Run the scripts in <code>/IntelligenceHub/IntelligenceHub.DAL/Scripts</code> after creating the database. If you plan to use Azure AI Search, your SQL database must be reachable from Azure (for example, by deploying an <a href="https://learn.microsoft.com/en-us/azure/azure-sql/database/single-database-create-quickstart?view=azuresql&tabs=azure-portal#prerequisites">Azure SQL Database</a> or exposing your local server).</li>
-        <li>An API key from one of the supported LLM providers (e.g., OpenAI, Azure OpenAI, or Anthropic). NOTE: Technically only one of the below is required, provided you only use that host.
-          <ul>
-            <li><strong>OpenAI</strong>: Retrieve your API key from <a href="https://help.openai.com/en/articles/4936850-where-do-i-find-my-openai-api-key">OpenAI's platform</a>.</li>
-            <li><strong>Anthropic</strong>: Sign in and create a <a href="https://console.anthropic.com/settings/keys">new API key here</a>. Make sure to save its details.</li>
-            <li><strong>Azure OpenAI</strong>: Create an Azure OpenAI resource, and be sure to deploy at least one LLM in your Azure OpenAI deployment. You can name this model deployment whatever you want, but be sure to add this name to the <code>ValidAGIModels</code> array when running the <code>env_setup.py</code> script. Instructions on deploying this resource can be <a href="https://learn.microsoft.com/en-us/azure/ai-services/openai/how-to/create-resource?pivots=web-portal">found here</a>.</li>
-          </ul>
-        </li>
-      </ul>
-      <h5>Additional Cloud Resources (Optional)</h5>
-      <p>You only need to set up these additional resources if you plan to use advanced features such as RAG operations. For basic completions, local configuration with a single LLM provider's API key is sufficient.</p>
-      <ul>
-        <li><strong>Azure SQL Database</strong> – Required when using Azure AI Search for RAG operations. Follow the <a href="https://learn.microsoft.com/en-us/azure/azure-sql/database/single-database-create-quickstart?view=azuresql&tabs=azure-portal#prerequisites">Azure SQL database quickstart guide</a> if you need to deploy one in Azure.</li>
-        <li><strong>Azure AI Search Services</strong> – Required for RAG operations that use Azure Search. Follow <a href="https://learn.microsoft.com/en-us/azure/search/search-create-service-portal">Azure's setup guide</a> to create a service. (NOTE: Azure AI Search requires your SQL server to either be in Azure, or to be accessible from the public internet)</li>
-        <li><strong>Weaviate Cloud</strong> – Alternatively, you can host indexes in Weaviate's managed cloud. See <a href="https://weaviate.io/developers/weaviate/installation/weaviate-cloud">Weaviate's documentation</a> for instructions. (Is compatible with any SQL database, no public internet access required)</li>
-        <li><strong>Application Insights</strong> – Only required for telemetry and performance monitoring. For setup, follow <a href="https://learn.microsoft.com/en-us/azure/azure-monitor/app/asp-net-core">these instructions for setting up Application Insights for .NET Core</a>. The application is already set up to use the service, so skip any sections that aren't related to getting a connection string.</li>
-      </ul>
-
-      <h4>3. Configure Application Settings</h4>
-      <ol>
-        <li><strong>Locate the Template and Output Paths</strong>:
-          <ul>
-            <li><strong>Template</strong>: <code>IntelligenceHub.Host/appsettings.Template.json</code></li>
-            <li><strong>Output</strong>: <code>IntelligenceHub.Host/appsettings.Development.json</code></li>
-          </ul>
-        </li>
-        <li><strong>Collect Any Required Secrets and Keys</strong>
-          <ul>
-            <li>Only the SQL database string, and one LLM host credential/url combination is required.</li>
-            <li>Refer to the <code>appsettings.Template.json</code> file for a list of all possible values.</li>
-          </ul>
-        </li>
-        <li><strong>Run the Script</strong>:
-          <ul>
-            <li>Open a terminal in the repository’s base directory.</li>
-            <li>Execute the script (e.g., open the command line, navigate to the file, and run: <code>python env_setup.py</code>).</li>
-            <li><strong>Script Details</strong>:
-              <ul>
-                <li>The script is configured to work in a CI/CD pipeline, but this setup is outside of the scope of this guide.</li>
-                <li>The script searches for environment variables before requesting they be populated by the user.</li>
-                <li>Supports multiple entries for service endpoints (e.g., Azure OpenAI Services, OpenAI Services, Anthropic Services).</li>
-                <li>Set environment variables to pre-populate the template. New variables such as <code>FeatureFlagSettings_UseAzureAISearch</code> enable optional features.</li>
-                <li>If using Azure OpenAI, be sure to populate <code>ValidAGIModels</code> with the names of your deployed models, otherwise leave empty.</li>
-                <li>Be sure to list any intended clients under <code>ValidOrigins</code>, which will be used to populate the CORS policy's allowed origins. Can be set to <code>*</code> for a permissive policy to get a dev environment up and running quickly.</li>
-                <li>For the <code>SearchServiceCompletionService</code> values, provide any set of credentials you used for one of the completion services, or if you don't intend to use RAG operations, feel free to leave it null. These values are used to generate the Keywords and Topic strings for RAG documents if <code>GenerateKeywords</code> or <code>GenerateTopic</code> is set to true on the targeted index.</li>
-              </ul>
-            </li>
-            <li>Upon completion, the script writes the updated configuration to <code>appsettings.Development.json</code>.</li>
-          </ul>
-        </li>
-      </ol>
-
-      <h4>4. Run the Application</h4>
-      <ol>
-        <li><strong>Open the solution folder if the repo did not already</strong></li>
-        <li><strong>Run the application</strong>
-          <ul>
-            <li>If using Visual Studio, click the drop down arrow next to 'run' button, and select 'Configure Startup Projects' from the list. Ensure that <code>IntelligenceHub.Host.csproj</code> is selected as the startup application, and then run the application.</li>
-            <li>Otherwise, start the application using 'Dotnet Run' or your preferred IDE.</li>
-          </ul>
-        </li>
-        <li><strong>Begin Making Requests Using the Swagger Page</strong>
-          <ul>
-            <li>Refer to the <a href="#usage">next section on usage</a> for help making your first request.</li>
-          </ul>
-        </li>
-      </ol>
-    </section>
-
     <section id="authentication">
       <h2>Authentication</h2>
       <p>The API uses JWT bearer authentication. Obtain a token using your API key with one of the following endpoints:</p>
@@ -336,15 +259,6 @@
       </ol>
       <p>Send your API key in the <code>X-Api-Key</code> header. The response payload is an <code>Auth0Response</code> containing the <code>access_token</code>. Include this token in subsequent requests using the <code>Authorization: Bearer {token}</code> header.</p>
     </section>
-
-    <section id="feature-flags">
-      <h2>Feature Flags</h2>
-      <p>Optional functionality can be toggled through feature flags stored in <code>FeatureFlagSettings</code>.</p>
-      <ul>
-        <li><strong>UseAzureAISearch</strong> – controls whether Azure AI Search endpoints are available. Set the <code>FeatureFlagSettings_UseAzureAISearch</code> environment variable (or update <code>appsettings.Development.json</code>) to <code>true</code> to enable these features.</li>
-      </ul>
-    </section>
-
     <section id="tenant-isolation">
       <h2>Tenant Isolation</h2>
       <p>Each user record includes a <code>TenantId</code>. When creating RAG indexes, the service prefixes the index name with the tenant ID to ensure resources from different tenants remain isolated. Index names returned by the API have the tenant prefix removed for convenience.</p>
@@ -2068,11 +1982,142 @@ await hubConnection.InvokeAsync("Send", request);</code></pre>
       <h2>Contact</h2>
       <p>For any questions, comments, or concerns, please reach out to <a href="mailto:Applied.AI.Help@gmail.com">Applied.AI.Help@gmail.com</a>, or open an issue in the repository.</p>
     </section>
+  </main>
+  </div>
+
+  <div id="selfhosted" class="tabcontent">
+  <nav id="sidebar">
+    <h2>Table of Contents</h2>
+    <ul>
+      <li><a href="#setup-self">Setup</a></li>
+      <li><a href="#feature-flags-self">Feature Flags</a></li>
+      <li><a href="#note-self">API Reference</a></li>
+    </ul>
+  </nav>
+  <main>
+    <section id="setup-self">
+      <h2>Setup</h2>
+      <h3>Setup Instructions</h3>
+      <p>This section outlines the steps required to set up the IntelligenceHub repository for local development. IntelligenceHub is a .NET API wrapper for AI services that relies on several external resources including AI service providers, search functionalities, and additional infrastructure.</p>
+      <p>Optional infrastructure can be treated modularly unless otherwise noted, but you should be able to find a free tier available for every piece of infrastructure as well, excluding the LLM hosts, although the Azure OpenAI option is at least a 'pay as you go' model, keeping things exceptionally cheap. A cloud account is needed if you plan to use Azure AI Search or Weaviate Cloud for RAG operations, or if you wish to use Azure OpenAI as your LLM host.</p>
+      <div class="callout">
+        <strong>NOTE:</strong> The application requires several sensitive keys and values to populate the configuration. If you intend to use an associated feature, please be sure to have the relevant keys and endpoint data ready when running the <code>env_setup.py</code> script at <code>IntelligenceHub/IntelligenceHub/infrastructure/env_setup.py</code>. The only required features are an SQL Server connection string, and the API key for at least one LLM host.
+      </div>
+
+      <h4>1. Environment Setup</h4>
+      <ul>
+        <li><strong>Ensure the following are installed</strong>:
+          <ul>
+            <li><a href="https://dotnet.microsoft.com/download">.NET SDK (version 8.0 or later)</a></li>
+            <li><a href="https://www.python.org/downloads/">Python 3.1 or later</a> – for running the appsettings generation script.</li>
+            <li><a href="https://visualstudio.microsoft.com/">Visual Studio 2022</a> is recommended for easiest set up, but technically the Git client should suffice.</li>
+          </ul>
+        </li>
+        <li><strong>Set Up the Repo</strong>:
+          <ol>
+            <li>Open Visual Studio, and select 'clone a repository.'</li>
+            <li>Get the Git repository URL at <a href="https://github.com/Jacob-J-Thomas/IntelligenceHub">https://github.com/Jacob-J-Thomas/IntelligenceHub</a>, and use it to clone the repo.</li>
+          </ol>
+        </li>
+      </ul>
+
+      <h4>2. Create Resource Dependencies</h4>
+      <p><strong>Note:</strong> The repository includes a Python script, <code>IntelligenceHub/infrastructure/env_setup.py</code>, that generates a development configuration file by populating <code>appsettings.Development.json</code> from a template. You may find it worthwhile to save the API keys and URLs associated with these resources so that you can easily enter them into the Python script later.</p>
+      <h5>Essential Resources for Basic Completions</h5>
+      <p>The below resources are the bare minimum requirements to run the API and get a <code>200</code> response from the <code>/Completion/Chat/{profileName}</code> endpoint. If your application requires RAG database operations or app insight telemetry collection, please ensure you follow the associated steps in the optional "Additional Cloud Resources" section.</p>
+      <ul>
+        <li><strong>SQL Database (required)</strong> – The application relies on SQL to store conversation history, completion profiles, and RAG metadata. You can use a local SQL Server instance following the <a href="https://docs.microsoft.com/en-us/sql/database-engine/install-windows/install-sql-server?view=sql-server-ver15">SQL Server Installation Guide</a> (free versions are <a href="https://www.microsoft.com/en-us/sql-server/sql-server-downloads">available here</a>). Run the scripts in <code>/IntelligenceHub/IntelligenceHub.DAL/Scripts</code> after creating the database. If you plan to use Azure AI Search, your SQL database must be reachable from Azure (for example, by deploying an <a href="https://learn.microsoft.com/en-us/azure/azure-sql/database/single-database-create-quickstart?view=azuresql&tabs=azure-portal#prerequisites">Azure SQL Database</a> or exposing your local server).</li>
+        <li>An API key from one of the supported LLM providers (e.g., OpenAI, Azure OpenAI, or Anthropic). NOTE: Technically only one of the below is required, provided you only use that host.
+          <ul>
+            <li><strong>OpenAI</strong>: Retrieve your API key from <a href="https://help.openai.com/en/articles/4936850-where-do-i-find-my-openai-api-key">OpenAI's platform</a>.</li>
+            <li><strong>Anthropic</strong>: Sign in and create a <a href="https://console.anthropic.com/settings/keys">new API key here</a>. Make sure to save its details.</li>
+            <li><strong>Azure OpenAI</strong>: Create an Azure OpenAI resource, and be sure to deploy at least one LLM in your Azure OpenAI deployment. You can name this model deployment whatever you want, but be sure to add this name to the <code>ValidAGIModels</code> array when running the <code>env_setup.py</code> script. Instructions on deploying this resource can be <a href="https://learn.microsoft.com/en-us/azure/ai-services/openai/how-to/create-resource?pivots=web-portal">found here</a>.</li>
+          </ul>
+        </li>
+      </ul>
+      <h5>Additional Cloud Resources (Optional)</h5>
+      <p>You only need to set up these additional resources if you plan to use advanced features such as RAG operations. For basic completions, local configuration with a single LLM provider's API key is sufficient.</p>
+      <ul>
+        <li><strong>Azure SQL Database</strong> – Required when using Azure AI Search for RAG operations. Follow the <a href="https://learn.microsoft.com/en-us/azure/azure-sql/database/single-database-create-quickstart?view=azuresql&tabs=azure-portal#prerequisites">Azure SQL database quickstart guide</a> if you need to deploy one in Azure.</li>
+        <li><strong>Azure AI Search Services</strong> – Required for RAG operations that use Azure Search. Follow <a href="https://learn.microsoft.com/en-us/azure/search/search-create-service-portal">Azure's setup guide</a> to create a service. (NOTE: Azure AI Search requires your SQL server to either be in Azure, or to be accessible from the public internet)</li>
+        <li><strong>Weaviate Cloud</strong> – Alternatively, you can host indexes in Weaviate's managed cloud. See <a href="https://weaviate.io/developers/weaviate/installation/weaviate-cloud">Weaviate's documentation</a> for instructions. (Is compatible with any SQL database, no public internet access required)</li>
+        <li><strong>Application Insights</strong> – Only required for telemetry and performance monitoring. For setup, follow <a href="https://learn.microsoft.com/en-us/azure/azure-monitor/app/asp-net-core">these instructions for setting up Application Insights for .NET Core</a>. The application is already set up to use the service, so skip any sections that aren't related to getting a connection string.</li>
+      </ul>
+
+      <h4>3. Configure Application Settings</h4>
+      <ol>
+        <li><strong>Locate the Template and Output Paths</strong>:
+          <ul>
+            <li><strong>Template</strong>: <code>IntelligenceHub.Host/appsettings.Template.json</code></li>
+            <li><strong>Output</strong>: <code>IntelligenceHub.Host/appsettings.Development.json</code></li>
+          </ul>
+        </li>
+        <li><strong>Collect Any Required Secrets and Keys</strong>
+          <ul>
+            <li>Only the SQL database string, and one LLM host credential/url combination is required.</li>
+            <li>Refer to the <code>appsettings.Template.json</code> file for a list of all possible values.</li>
+          </ul>
+        </li>
+        <li><strong>Run the Script</strong>:
+          <ul>
+            <li>Open a terminal in the repository’s base directory.</li>
+            <li>Execute the script (e.g., open the command line, navigate to the file, and run: <code>python env_setup.py</code>).</li>
+            <li><strong>Script Details</strong>:
+              <ul>
+                <li>The script is configured to work in a CI/CD pipeline, but this setup is outside of the scope of this guide.</li>
+                <li>The script searches for environment variables before requesting they be populated by the user.</li>
+                <li>Supports multiple entries for service endpoints (e.g., Azure OpenAI Services, OpenAI Services, Anthropic Services).</li>
+                <li>Set environment variables to pre-populate the template. New variables such as <code>FeatureFlagSettings_UseAzureAISearch</code> enable optional features.</li>
+                <li>If using Azure OpenAI, be sure to populate <code>ValidAGIModels</code> with the names of your deployed models, otherwise leave empty.</li>
+                <li>Be sure to list any intended clients under <code>ValidOrigins</code>, which will be used to populate the CORS policy's allowed origins. Can be set to <code>*</code> for a permissive policy to get a dev environment up and running quickly.</li>
+                <li>For the <code>SearchServiceCompletionService</code> values, provide any set of credentials you used for one of the completion services, or if you don't intend to use RAG operations, feel free to leave it null. These values are used to generate the Keywords and Topic strings for RAG documents if <code>GenerateKeywords</code> or <code>GenerateTopic</code> is set to true on the targeted index.</li>
+              </ul>
+            </li>
+            <li>Upon completion, the script writes the updated configuration to <code>appsettings.Development.json</code>.</li>
+          </ul>
+        </li>
+      </ol>
+
+      <h4>4. Run the Application</h4>
+      <ol>
+        <li><strong>Open the solution folder if the repo did not already</strong></li>
+        <li><strong>Run the application</strong>
+          <ul>
+            <li>If using Visual Studio, click the drop down arrow next to 'run' button, and select 'Configure Startup Projects' from the list. Ensure that <code>IntelligenceHub.Host.csproj</code> is selected as the startup application, and then run the application.</li>
+            <li>Otherwise, start the application using 'Dotnet Run' or your preferred IDE.</li>
+          </ul>
+        </li>
+        <li><strong>Begin Making Requests Using the Swagger Page</strong>
+          <ul>
+            <li>Refer to the managed service documentation for usage examples.</li>
+          </ul>
+        </li>
+      </ol>
+    </section>
+
+    <section id="feature-flags-self">
+      <h2>Feature Flags</h2>
+      <p>Optional functionality can be toggled through feature flags stored in <code>FeatureFlagSettings</code>.</p>
+      <ul>
+        <li><strong>UseAzureAISearch</strong> – controls whether Azure AI Search endpoints are available. Set the <code>FeatureFlagSettings_UseAzureAISearch</code> environment variable (or update <code>appsettings.Development.json</code>) to <code>true</code> to enable these features.</li>
+      </ul>
+    </section>
+
+    <section id="note-self">
+      <h2>API Reference</h2>
+      <p>The self-hosted API uses the same endpoints and authentication flow as the managed service. Refer to the Managed Service tab for complete API documentation.</p>
+    </section>
+  </main>
+  </div>
+
   <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js"></script>
   <script>
     function toggleMenu() {
-      const sidebar = document.getElementById('sidebar');
-      sidebar.classList.toggle('open');
+      document.querySelectorAll('#sidebar').forEach(sb => sb.classList.toggle('open'));
+    }
+    function openTab(evt, tabName) {
+      document.querySelectorAll('.tabcontent').forEach(tc => tc.classList.remove('active'));
+      document.getElementById(tabName).classList.add('active');
     }
     document.querySelectorAll('.copy-btn').forEach(btn => {
       btn.addEventListener('click', () => {
