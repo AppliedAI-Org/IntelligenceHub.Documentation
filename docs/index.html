@@ -1,0 +1,2088 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>The Intelligence Hub Documentation</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism.min.css">
+  <style>
+    :root {
+      --bg-color: #ffffff;
+      --bg-alt-color: #f7f7fb;
+      --text-color: #333333;
+      --code-bg-color: #2d2d2d;
+      --link-color: #007bff;
+      --border-color: #e0e0e0;
+      --sidebar-width: 280px;
+      --header-height: 60px;
+    }
+    body {
+      font-family: Arial, sans-serif;
+      line-height: 1.6;
+      margin: 0;
+      padding: 0;
+      background-color: var(--bg-color);
+      color: var(--text-color);
+    }
+    header {
+      background-color: #007bff;
+      color: white;
+      padding: 1rem;
+      text-align: center;
+      position: fixed;
+      top: 0;
+      width: 100%;
+      height: var(--header-height);
+      z-index: 1000;
+    }
+    nav {
+      width: var(--sidebar-width);
+      position: fixed;
+      top: var(--header-height);
+      left: 0;
+      height: calc(100vh - var(--header-height));
+      overflow-y: auto;
+      background-color: var(--bg-alt-color);
+      padding: 1rem;
+      border-right: 1px solid var(--border-color);
+    }
+    nav ul {
+      list-style: none;
+      padding: 0;
+    }
+    nav ul li {
+      margin: 0.5rem 0;
+    }
+    nav ul li a {
+      color: var(--text-color);
+      text-decoration: none;
+    }
+    nav ul li a:hover {
+      color: var(--link-color);
+    }
+    main {
+      margin-left: var(--sidebar-width);
+      padding: 2rem;
+      padding-top: calc(var(--header-height) + 2rem);
+    }
+    section {
+      margin-bottom: 3rem;
+    }
+    h1, h2, h3, h4 {
+      color: var(--text-color);
+    }
+    code {
+      background-color: var(--code-bg-color);
+      color: #ffffff;
+      padding: 0.2rem 0.4rem;
+      border-radius: 4px;
+    }
+    pre {
+      background-color: var(--code-bg-color);
+      color: #ffffff;
+      padding: 1rem;
+      border-radius: 8px;
+      overflow-x: auto;
+      position: relative;
+    }
+    .code-block {
+      position: relative;
+      margin: 1rem 0;
+    }
+    .copy-btn {
+      position: absolute;
+      top: 5px;
+      right: 5px;
+      padding: 5px 10px;
+      background-color: #007bff;
+      color: #fff;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+    }
+    .copy-btn:hover {
+      background-color: #0056b3;
+    }
+    .method {
+      padding: 0.2rem 0.5rem;
+      border-radius: 4px;
+      color: #fff;
+      margin-right: 0.5rem;
+    }
+    .method.post { background-color: #28a745; }
+    .method.get { background-color: #007bff; }
+    .method.delete { background-color: #dc3545; }
+    .callout {
+      border-left: 4px solid #ff8c00;
+      background-color: var(--bg-alt-color);
+      padding: 1rem;
+      margin: 1rem 0;
+      border-radius: 4px;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 1rem 0;
+    }
+    th, td {
+      border: 1px solid var(--border-color);
+      padding: 0.5rem;
+      text-align: left;
+    }
+    th {
+      background-color: var(--bg-alt-color);
+    }
+    @media (max-width: 768px) {
+      nav {
+        width: 100%;
+        height: 100vh;
+        transform: translateX(-100%);
+        transition: transform 0.3s ease;
+      }
+      nav.open {
+        transform: translateX(0);
+      }
+      main {
+        margin-left: 0;
+      }
+      .menu-toggle {
+        display: block;
+        position: fixed;
+        top: 10px;
+        left: 10px;
+        background: none;
+        border: none;
+        font-size: 1.5rem;
+        color: white;
+        cursor: pointer;
+      }
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <button class="menu-toggle" onclick="toggleMenu()">☰</button>
+    <h1>The Intelligence Hub</h1>
+  </header>
+  <nav id="sidebar">
+    <h2>Table of Contents</h2>
+    <ul>
+      <li><a href="#overview">Overview</a></li>
+      <li><a href="#features">Features</a></li>
+      <li><a href="#setup">Setup</a></li>
+      <li><a href="#authentication">Authentication</a></li>
+      <li><a href="#feature-flags">Feature Flags</a></li>
+      <li><a href="#tenant-isolation">Tenant Isolation</a></li>
+      <li><a href="#rate-limiting">Rate Limiting</a></li>
+      <li><a href="#usage">Usage</a></li>
+      <li><a href="#api-reference">API Reference</a></li>
+      <li><a href="#contributing">Contributing</a></li>
+      <li><a href="#contact">Contact</a></li>
+      <li><a href="#license">License</a></li>
+      <li><a href="#acknowledgements">Acknowledgements</a></li>
+    </ul>
+  </nav>
+  <main>
+    <section id="overview">
+      <h2>Overview</h2>
+      <p>The main goal of this project is to enable rapid setup and development for AI-powered applications. With minor configurations, a payload as slim as the below      below can be used for powerful AGI operations ranging from standard chat completions, to image generation, tool execution, and RAG powered searches.</p>
+      <div class="code-block">
+        <button class="copy-btn">Copy</button>
+        <pre><code class="language-json">{
+    "Messages": [  
+        {  
+            "Role": "User",   
+            "Content": "Generate an image of a dog! | Set an alarm for 7 a.m. please. | What books does John Bookwerm currently have checked out?"
+        } 
+    ] 
+}</code></pre>
+      </div>
+      <p>Key capabilities include:</p>
+      <ul>
+        <li>Simplified request payloads to AGI clients using pre-configured agent/completion 'profiles'</li>
+        <li>Saving and loading conversation history</li>
+        <li>Tool execution at external APIs</li>
+        <li>RAG database creation and consumption</li>
+        <li>Conversation persistence</li>
+      </ul>
+      <p>AI clients are resolved using a custom client factory, allowing new clients to be added easily by implementing the <code>IAGIClient</code> interface. This design also supports image generation from various clients, decoupling the image generation providers from LLM providers within the same agent profile. A similar design could also be used to provide support for multiple RAG services with relative ease.</p>
+      <p>For more information, please refer to the <a href="#features">Features</a> section below.</p>
+    </section>
+
+    <section id="features">
+      <h2>Features</h2>
+      <ol>
+        <li><strong>Saving agentic chat 'profiles'</strong> to simplify client requests, and create preset configurations related to prompting and AI model configs.</li>
+        <li><strong>Chat completions</strong> including streaming via a SignalR web socket or via server side events, and support for custom models deployed in Azure AI Studio.</li>
+        <li><strong>RAG database support</strong>, including database creation, document ingestion, and the ability to perform RAG operations across AGI service providers. Support now includes Azure AI Search and Weaviate.</li>
+        <li><strong>Multimodality and image generation</strong> including the ability to mix and match image generation models across AGI service providers.</li>
+        <li><strong>Tool execution</strong> via returning the tool arguments to the client, or executing them against an external API, and returning the resulting HTTP response data.</li>
+        <li><strong>Conversation history</strong> saving and loading from the database.</li>
+        <li><strong>Support for multiple AGI providers</strong>, which currently includes Azure AI, OpenAI, and Anthropic.</li>
+        <li><strong>Chat recursion</strong> allowing LLM models to continue dialogues between themselves and other agent profiles, pass off complex processes to more specialized profiles, and generate additional content that would otherwise surpass the output window.</li>
+        <li><strong>Resilient design</strong> including automatic load balancing, and retry policies.</li>
+        <li><strong>Automatic logging</strong> via Application Insights.</li>
+        <li><strong>Front-end template</strong> to jump start the process of building custom applications to consume the API.</li>
+        <li><strong>Testing utilities</strong> including unit tests, stress tests, and an AI competency testing module.</li>
+      </ol>
+    </section>
+
+    <section id="setup">
+      <h2>Setup</h2>
+      <h3>Setup Instructions</h3>
+      <p>This section outlines the steps required to set up the IntelligenceHub repository for local development. IntelligenceHub is a .NET API wrapper for AI services that relies on several external resources including AI service providers, search functionalities, and additional infrastructure.</p>
+      <p>Optional infrastructure can be treated modularly unless otherwise noted, but you should be able to find a free tier available for every piece of infrastructure as well, excluding the LLM hosts, although the Azure OpenAI option is at least a 'pay as you go' model, keeping things exceptionally cheap. A cloud account is needed if you plan to use Azure AI Search or Weaviate Cloud for RAG operations, or if you wish to use Azure OpenAI as your LLM host.</p>
+      <div class="callout">
+        <strong>NOTE:</strong> The application requires several sensitive keys and values to populate the configuration. If you intend to use an associated feature, please be sure to have the relevant keys and endpoint data ready when running the <code>env_setup.py</code> script at <code>IntelligenceHub/IntelligenceHub/infrastructure/env_setup.py</code>. The only required features are an SQL Server connection string, and the API key for at least one LLM host.
+      </div>
+
+      <h4>1. Environment Setup</h4>
+      <ul>
+        <li><strong>Ensure the following are installed</strong>:
+          <ul>
+            <li><a href="https://dotnet.microsoft.com/download">.NET SDK (version 8.0 or later)</a></li>
+            <li><a href="https://www.python.org/downloads/">Python 3.1 or later</a> – for running the appsettings generation script.</li>
+            <li><a href="https://visualstudio.microsoft.com/">Visual Studio 2022</a> is recommended for easiest set up, but technically the Git client should suffice.</li>
+          </ul>
+        </li>
+        <li><strong>Set Up the Repo</strong>:
+          <ol>
+            <li>Open Visual Studio, and select 'clone a repository.'</li>
+            <li>Get the Git repository URL at <a href="https://github.com/Jacob-J-Thomas/IntelligenceHub">https://github.com/Jacob-J-Thomas/IntelligenceHub</a>, and use it to clone the repo.</li>
+          </ol>
+        </li>
+      </ul>
+
+      <h4>2. Create Resource Dependencies</h4>
+      <p><strong>Note:</strong> The repository includes a Python script, <code>IntelligenceHub/infrastructure/env_setup.py</code>, that generates a development configuration file by populating <code>appsettings.Development.json</code> from a template. You may find it worthwhile to save the API keys and URLs associated with these resources so that you can easily enter them into the Python script later.</p>
+      <h5>Essential Resources for Basic Completions</h5>
+      <p>The below resources are the bare minimum requirements to run the API and get a <code>200</code> response from the <code>/Completion/Chat/{profileName}</code> endpoint. If your application requires RAG database operations or app insight telemetry collection, please ensure you follow the associated steps in the optional "Additional Cloud Resources" section.</p>
+      <ul>
+        <li><strong>SQL Database (required)</strong> – The application relies on SQL to store conversation history, completion profiles, and RAG metadata. You can use a local SQL Server instance following the <a href="https://docs.microsoft.com/en-us/sql/database-engine/install-windows/install-sql-server?view=sql-server-ver15">SQL Server Installation Guide</a> (free versions are <a href="https://www.microsoft.com/en-us/sql-server/sql-server-downloads">available here</a>). Run the scripts in <code>/IntelligenceHub/IntelligenceHub.DAL/Scripts</code> after creating the database. If you plan to use Azure AI Search, your SQL database must be reachable from Azure (for example, by deploying an <a href="https://learn.microsoft.com/en-us/azure/azure-sql/database/single-database-create-quickstart?view=azuresql&tabs=azure-portal#prerequisites">Azure SQL Database</a> or exposing your local server).</li>
+        <li>An API key from one of the supported LLM providers (e.g., OpenAI, Azure OpenAI, or Anthropic). NOTE: Technically only one of the below is required, provided you only use that host.
+          <ul>
+            <li><strong>OpenAI</strong>: Retrieve your API key from <a href="https://help.openai.com/en/articles/4936850-where-do-i-find-my-openai-api-key">OpenAI's platform</a>.</li>
+            <li><strong>Anthropic</strong>: Sign in and create a <a href="https://console.anthropic.com/settings/keys">new API key here</a>. Make sure to save its details.</li>
+            <li><strong>Azure OpenAI</strong>: Create an Azure OpenAI resource, and be sure to deploy at least one LLM in your Azure OpenAI deployment. You can name this model deployment whatever you want, but be sure to add this name to the <code>ValidAGIModels</code> array when running the <code>env_setup.py</code> script. Instructions on deploying this resource can be <a href="https://learn.microsoft.com/en-us/azure/ai-services/openai/how-to/create-resource?pivots=web-portal">found here</a>.</li>
+          </ul>
+        </li>
+      </ul>
+      <h5>Additional Cloud Resources (Optional)</h5>
+      <p>You only need to set up these additional resources if you plan to use advanced features such as RAG operations. For basic completions, local configuration with a single LLM provider's API key is sufficient.</p>
+      <ul>
+        <li><strong>Azure SQL Database</strong> – Required when using Azure AI Search for RAG operations. Follow the <a href="https://learn.microsoft.com/en-us/azure/azure-sql/database/single-database-create-quickstart?view=azuresql&tabs=azure-portal#prerequisites">Azure SQL database quickstart guide</a> if you need to deploy one in Azure.</li>
+        <li><strong>Azure AI Search Services</strong> – Required for RAG operations that use Azure Search. Follow <a href="https://learn.microsoft.com/en-us/azure/search/search-create-service-portal">Azure's setup guide</a> to create a service. (NOTE: Azure AI Search requires your SQL server to either be in Azure, or to be accessible from the public internet)</li>
+        <li><strong>Weaviate Cloud</strong> – Alternatively, you can host indexes in Weaviate's managed cloud. See <a href="https://weaviate.io/developers/weaviate/installation/weaviate-cloud">Weaviate's documentation</a> for instructions. (Is compatible with any SQL database, no public internet access required)</li>
+        <li><strong>Application Insights</strong> – Only required for telemetry and performance monitoring. For setup, follow <a href="https://learn.microsoft.com/en-us/azure/azure-monitor/app/asp-net-core">these instructions for setting up Application Insights for .NET Core</a>. The application is already set up to use the service, so skip any sections that aren't related to getting a connection string.</li>
+      </ul>
+
+      <h4>3. Configure Application Settings</h4>
+      <ol>
+        <li><strong>Locate the Template and Output Paths</strong>:
+          <ul>
+            <li><strong>Template</strong>: <code>IntelligenceHub.Host/appsettings.Template.json</code></li>
+            <li><strong>Output</strong>: <code>IntelligenceHub.Host/appsettings.Development.json</code></li>
+          </ul>
+        </li>
+        <li><strong>Collect Any Required Secrets and Keys</strong>
+          <ul>
+            <li>Only the SQL database string, and one LLM host credential/url combination is required.</li>
+            <li>Refer to the <code>appsettings.Template.json</code> file for a list of all possible values.</li>
+          </ul>
+        </li>
+        <li><strong>Run the Script</strong>:
+          <ul>
+            <li>Open a terminal in the repository’s base directory.</li>
+            <li>Execute the script (e.g., open the command line, navigate to the file, and run: <code>python env_setup.py</code>).</li>
+            <li><strong>Script Details</strong>:
+              <ul>
+                <li>The script is configured to work in a CI/CD pipeline, but this setup is outside of the scope of this guide.</li>
+                <li>The script searches for environment variables before requesting they be populated by the user.</li>
+                <li>Supports multiple entries for service endpoints (e.g., Azure OpenAI Services, OpenAI Services, Anthropic Services).</li>
+                <li>Set environment variables to pre-populate the template. New variables such as <code>FeatureFlagSettings_UseAzureAISearch</code> enable optional features.</li>
+                <li>If using Azure OpenAI, be sure to populate <code>ValidAGIModels</code> with the names of your deployed models, otherwise leave empty.</li>
+                <li>Be sure to list any intended clients under <code>ValidOrigins</code>, which will be used to populate the CORS policy's allowed origins. Can be set to <code>*</code> for a permissive policy to get a dev environment up and running quickly.</li>
+                <li>For the <code>SearchServiceCompletionService</code> values, provide any set of credentials you used for one of the completion services, or if you don't intend to use RAG operations, feel free to leave it null. These values are used to generate the Keywords and Topic strings for RAG documents if <code>GenerateKeywords</code> or <code>GenerateTopic</code> is set to true on the targeted index.</li>
+              </ul>
+            </li>
+            <li>Upon completion, the script writes the updated configuration to <code>appsettings.Development.json</code>.</li>
+          </ul>
+        </li>
+      </ol>
+
+      <h4>4. Run the Application</h4>
+      <ol>
+        <li><strong>Open the solution folder if the repo did not already</strong></li>
+        <li><strong>Run the application</strong>
+          <ul>
+            <li>If using Visual Studio, click the drop down arrow next to 'run' button, and select 'Configure Startup Projects' from the list. Ensure that <code>IntelligenceHub.Host.csproj</code> is selected as the startup application, and then run the application.</li>
+            <li>Otherwise, start the application using 'Dotnet Run' or your preferred IDE.</li>
+          </ul>
+        </li>
+        <li><strong>Begin Making Requests Using the Swagger Page</strong>
+          <ul>
+            <li>Refer to the <a href="#usage">next section on usage</a> for help making your first request.</li>
+          </ul>
+        </li>
+      </ol>
+    </section>
+
+    <section id="authentication">
+      <h2>Authentication</h2>
+      <p>The API uses JWT bearer authentication. Obtain a token using your API key with one of the following endpoints:</p>
+      <ol>
+        <li><code>GET /auth/defaulttoken</code> – returns a standard token for typical API access.</li>
+        <li><code>GET /auth/admintoken</code> – returns an elevated token for administrative actions.</li>
+      </ol>
+      <p>Send your API key in the <code>X-Api-Key</code> header. The response payload is an <code>Auth0Response</code> containing the <code>access_token</code>. Include this token in subsequent requests using the <code>Authorization: Bearer {token}</code> header.</p>
+    </section>
+
+    <section id="feature-flags">
+      <h2>Feature Flags</h2>
+      <p>Optional functionality can be toggled through feature flags stored in <code>FeatureFlagSettings</code>.</p>
+      <ul>
+        <li><strong>UseAzureAISearch</strong> – controls whether Azure AI Search endpoints are available. Set the <code>FeatureFlagSettings_UseAzureAISearch</code> environment variable (or update <code>appsettings.Development.json</code>) to <code>true</code> to enable these features.</li>
+      </ul>
+    </section>
+
+    <section id="tenant-isolation">
+      <h2>Tenant Isolation</h2>
+      <p>Each user record includes a <code>TenantId</code>. When creating RAG indexes, the service prefixes the index name with the tenant ID to ensure resources from different tenants remain isolated. Index names returned by the API have the tenant prefix removed for convenience.</p>
+    </section>
+
+    <section id="rate-limiting">
+      <h2>Rate Limiting</h2>
+      <p>Requests are subject to per-user rate limits. Free users may send up to <strong>10 requests per minute</strong> and no more than <strong>100 requests per month</strong>. Paid users are allowed <strong>60 requests per minute</strong> without a monthly cap. Exceeding these limits results in a <code>429 Too Many Requests</code> response.</p>
+    </section>
+
+    <section id="usage">
+      <h2>Usage</h2>
+      <p>The heart of this API is the concept of an agentic <code>profile</code>, which can be thought of as a preset of request parameters and prompting data that can be used to return LLM chat completions, and other responses. Using profiles, you can easily handle saving system prompts, tool definitions, and model settings, allowing clients to receive AI content with nothing more than the name of the profile, and a single user message.</p>
+      <p>Follow these steps to create a profile and then make a chat request using that profile.</p>
+
+      <h4>1. Create or Update a Profile</h4>
+      <p>Use the upsert endpoint to create (or update) an agent profile. In this example, we create a profile named <strong>ChatProfile</strong>. Only a Name, Host, and Model are required to create a profile. The rest of the details can be defaulted.</p>
+      <p><strong>HTTP Request:</strong> <span class="method post">POST</span> <code>https://yourapi.com/Profile/upsert</code></p>
+      <div class="code-block">
+        <button class="copy-btn">Copy</button>
+        <pre><code class="language-json">{
+    "Name": "ChatProfile",
+    "Model": "gpt-4o",
+    "Host": "OpenAI",
+    "Temperature": 0.7,
+    "MaxTokens": 150
+}</code></pre>
+      </div>
+      <div class="code-block">
+        <button class="copy-btn">Copy</button>
+        <pre><code class="language-bash">curl -X POST "https://yourapi.com/Profile/upsert" \
+     -H "Content-Type: application/json" \
+     -d '{
+           "Name": "ChatProfile",
+           "Model": "gpt-4o",
+           "Host": "OpenAI",
+           "Temperature": 0.7,
+           "MaxTokens": 150
+         }'</code></pre>
+      </div>
+      <p>If successful, the API will create or update the <strong>ChatProfile</strong> with the provided configuration.</p>
+
+      <h4>2. Make a Chat Request</h4>
+      <p>With the profile created, you can now send a chat request using the Chat Completion API.</p>
+      <p><strong>HTTP Request:</strong> <span class="method post">POST</span> <code>https://yourapi.com/Completion/Chat/ChatProfile</code></p>
+      <div class="code-block">
+        <button class="copy-btn">Copy</button>
+        <pre><code class="language-json">{
+    "ConversationId": "d290f1ee-6c54-4b01-90e6-d701748f0851",
+    "ProfileOptions": {
+        "Name": "ChatProfile",
+        "Model": "gpt-4o",
+        "Host": "OpenAI",
+        "Temperature": 0.7,
+        "MaxTokens": 150
+    },
+    "Messages": [
+        {
+            "Role": "User",
+            "Content": "Hello, how are you?"
+        }
+    ]
+}</code></pre>
+      </div>
+      <div class="code-block">
+        <button class="copy-btn">Copy</button>
+        <pre><code class="language-bash">curl -X POST "https://yourapi.com/Completion/Chat/ChatProfile" \
+     -H "Authorization: Bearer {token}" \
+     -H "Content-Type: application/json" \
+     -d '{
+           "ConversationId": "d290f1ee-6c54-4b01-90e6-d701748f0851",
+           "ProfileOptions": {
+               "Name": "ChatProfile",
+               "Model": "gpt-4o",
+               "Host": "OpenAI",
+               "Temperature": 0.7,
+               "MaxTokens": 150
+           },
+           "Messages": [
+               {
+                   "Role": "User",
+                   "Content": "Hello, how are you?"
+               }
+           ]
+         }'</code></pre>
+      </div>
+      <p><strong>Expected Response:</strong></p>
+      <div class="code-block">
+        <button class="copy-btn">Copy</button>
+        <pre><code class="language-json">{
+    "Messages": [
+        {
+            "Role": "Assistant",
+            "Content": "I'm good! How can I assist you today?"
+        }
+    ],
+    "ToolCalls": {},
+    "ToolExecutionResponses": [],
+    "FinishReason": "Stop | Length | ToolCalls | ContentFilter | TooManyRequests | Error"
+}</code></pre>
+      </div>
+
+      <h4>3. Integrate RAG Index with Chat Requests</h4>
+      <p>To enable your AI model to answer queries using information stored in a RAG index, follow these steps:</p>
+
+      <h5>3.1 Create a RAG Index</h5>
+      <p>Use the <strong>Create RAG Index</strong> endpoint to define a new RAG index. For example, to create an index named <strong>MyRagIndex</strong>, send a POST request with the required index metadata.</p>
+      <p><strong>HTTP Request:</strong> <span class="method post">POST</span> <code>https://yourapi.com/Rag/Index</code></p>
+      <div class="code-block">
+        <button class="copy-btn">Copy</button>
+        <pre><code class="language-json">{
+    "Name": "MyRagIndex",
+    "GenerationHost": "AzureAI",
+    "RagHost": "Azure",
+    "IndexingInterval": "00:05:00",
+    "EmbeddingModel": "ada-text-embedding-002",
+    "MaxRagAttachments": 10,
+    "ChunkOverlap": 0.2,
+    "ScoringProfile": {
+        "Name": "DefaultScoring",
+        "SearchAggregation": "Sum",
+        "SearchInterpolation": "Linear",
+        "FreshnessBoost": 1.0,
+        "BoostDurationDays": 7,
+        "TagBoost": 1.5,
+        "Weights": {
+            "field1": 0.8,
+            "field2": 1.2
+        }
+    },
+    "GenerateKeywords": true,
+    "GenerateTopic": false
+}</code></pre>
+      </div>
+      <div class="code-block">
+        <button class="copy-btn">Copy</button>
+        <pre><code class="language-bash">curl -X POST "https://yourapi.com/Rag/Index" \
+     -H "Content-Type: application/json" \
+     -d '{
+           "Name": "MyRagIndex",
+           "GenerationHost": "AzureAI",
+           "RagHost": "Azure",
+           "IndexingInterval": "00:05:00",
+           "EmbeddingModel": "ada-text-embedding-002",
+           "MaxRagAttachments": 10,
+           "ChunkOverlap": 0.2,
+           "ScoringProfile": {
+               "Name": "DefaultScoring",
+               "SearchAggregation": "Sum",
+               "SearchInterpolation": "Linear",
+               "FreshnessBoost": 1.0,
+               "BoostDurationDays": 7,
+               "TagBoost": 1.5,
+               "Weights": {
+                   "field1": 0.8,
+                   "field2": 1.2
+               }
+           },
+           "GenerateKeywords": true,
+           "GenerateTopic": false
+         }'</code></pre>
+      </div>
+      <p>A successful request will return the index metadata for <strong>MyRagIndex</strong>.</p>
+
+      <h5>3.2 Add a New Document to the RAG Index</h5>
+      <p>After creating the index, add or update documents using the <strong>Upsert Documents</strong> endpoint.</p>
+      <p><strong>HTTP Request:</strong> <span class="method post">POST</span> <code>https://yourapi.com/Rag/index/MyRagIndex/Document</code></p>
+      <div class="code-block">
+        <button class="copy-btn">Copy</button>
+        <pre><code class="language-json">{
+    "Documents": [
+        {
+            "Title": "Azure AI Overview",
+            "Content": "Detailed information on Azure AI Search Services and its capabilities...",
+            "Topic": "Azure",
+            "Keywords": "AI, Search, Azure",
+            "Source": "Official Documentation"
+        }
+    ]
+}</code></pre>
+      </div>
+      <div class="code-block">
+        <button class="copy-btn">Copy</button>
+        <pre><code class="language-bash">curl -X POST "https://yourapi.com/Rag/index/MyRagIndex/Document" \
+     -H "Content-Type: application/json" \
+     -d '{
+           "Documents": [
+               {
+                   "Title": "Azure AI Overview",
+                   "Content": "Detailed information on Azure AI Search Services and its capabilities...",
+                   "Topic": "Azure",
+                   "Keywords": "AI, Search, Azure",
+                   "Source": "Official Documentation"
+               }
+           ]
+         }'</code></pre>
+      </div>
+      <p>This request will upsert the document into <strong>MyRagIndex</strong>.</p>
+
+      <h5>3.3 Run an Update on the RAG Index</h5>
+      <p>Once you have added new content, refresh the RAG index by initiating an update run.</p>
+      <p><strong>HTTP Request:</strong> <span class="method post">POST</span> <code>https://yourapi.com/Rag/Index/MyRagIndex/Run</code></p>
+      <div class="code-block">
+        <button class="copy-btn">Copy</button>
+        <pre><code class="language-bash">curl -X POST "https://yourapi.com/Rag/Index/MyRagIndex/Run"</code></pre>
+      </div>
+      <p>A successful update will return a <code>204 No Content</code> status, indicating that the index update process has started.</p>
+
+      <h5>3.4 Make a Chat Request with RAG Database Integration</h5>
+      <p>Finally, to leverage the RAG index during chat interactions, include the <code>RagDatabase</code> property in the <code>ProfileOptions</code> of your chat request. This tells the AI model to retrieve and use the context from <strong>MyRagIndex</strong>.</p>
+      <p><strong>HTTP Request:</strong> <span class="method post">POST</span> <code>https://yourapi.com/Completion/Chat/ChatProfile</code></p>
+      <div class="code-block">
+        <button class="copy-btn">Copy</button>
+        <pre><code class="language-json">{
+    "ConversationId": "d290f1ee-6c54-4b01-90e6-d701748f0851",
+    "ProfileOptions": {
+        "Name": "ChatProfile",
+        "Model": "gpt-4o",
+        "Host": "OpenAI",
+        "Temperature": 0.7,
+        "MaxTokens": 150,
+        "RagDatabase": "MyRagIndex"
+    },
+    "Messages": [
+        {
+            "Role": "User",
+            "Content": "Can you tell me about Azure AI Services?"
+        }
+    ]
+}</code></pre>
+      </div>
+      <div class="code-block">
+        <button class="copy-btn">Copy</button>
+        <pre><code class="language-bash">curl -X POST "https://yourapi.com/Completion/Chat/ChatProfile" \
+     -H "Authorization: Bearer {token}" \
+     -H "Content-Type: application/json" \
+     -d '{
+           "ConversationId": "d290f1ee-6c54-4b01-90e6-d701748f0851",
+           "ProfileOptions": {
+               "Name": "ChatProfile",
+               "Model": "gpt-4o",
+               "Host": "OpenAI",
+               "Temperature": 0.7,
+               "MaxTokens": 150,
+               "RagDatabase": "MyRagIndex"
+           },
+           "Messages": [
+               {
+                   "Role": "User",
+                   "Content": "Can you tell me about Azure AI Services?"
+               }
+           ]
+         }'</code></pre>
+      </div>
+      <p>When processed, the AI model will use the documents and context from <strong>MyRagIndex</strong> to provide an informed response to your query.</p>
+    </section>
+
+    <section id="api-reference">
+      <h2>API Reference</h2>
+
+      <h3>Chat Completion API Reference</h3>
+      <p><strong>Base URL</strong> <code>/Completion</code></p>
+      <p>The <code>CompletionController</code> handles LLM chat requests (completions) via standard HTTP responses or Server-Sent Events (SSE). For streaming, please see the section on the <code>ChatHub</code>.</p>
+
+      <h4>1. Chat Request (Standard Response)</h4>
+      <p><strong>HTTP Request:</strong> <span class="method post">POST</span> <code>/Completion/Chat/{name?}</code></p>
+      <p><strong>Description:</strong> Receives a chat request and returns a standard HTTP response. The only required parameters are the name of the agent profile, and a <code>Messages</code> array with at least one Message with its <code>Role</code> set to <code>User</code>, and a valid <code>Content</code> string.</p>
+      <ul>
+        <li>Provide a <code>ConversationId</code> if you want to let the API handle conversation persistence, or leave null.</li>
+        <li>The <code>ProfileOptions</code> object can be used to overwrite any values saved to the agent profile configuration, but is entirely optional so long as the <code>name</code> is passed in through the request route parameter.</li>
+      </ul>
+      <p><strong>Route Parameters:</strong></p>
+      <ul>
+        <li><code>Name</code> (string): The agent profile <code>Name</code> for the request. Defaults to <code>ProfileOptions.Name</code> in the request body if not provided.</li>
+      </ul>
+      <p><strong>Request Body:</strong></p>
+      <div class="code-block">
+        <button class="copy-btn">Copy</button>
+        <pre><code class="language-json">{   
+    "ConversationId": "A GUID can be provided here to persist conversational data. (optional)",   
+    "ProfileOptions": {   
+        "Name": "The name of the agent profile to use to populate these options. (optional if the name is provided in the request route)",   
+        "Model": "The name of the model. (optional)",   
+        "Host": "The name of the host service. Valid values are: Azure | OpenAI | Anthropic. (optional)",   
+        "ImageHost": "The service to use for image generation. (optional - defaults to 'Host' if empty)",   
+        "RagDatabase": "The name of a RAG database, if one is being used. (optional)",   
+        "FrequencyPenalty": "The frequency penalty. (optional)",   
+        "PresencePenalty": "The presence penalty. (optional)",   
+        "Temperature": "The temperature. (optional)",   
+        "TopP": "The TopP. (optional)",   
+        "MaxTokens": "The maximum number of tokens to use for the completion. (optional)",   
+        "TopLogprobs": "How many log probs to return (optional)",   
+        "Logprobs": "Whether or not to return log probabilities (optional)",   
+        "User": "A user name to associate with the request. (optional)",   
+        "ToolChoice": "A tool to call. Can be used to force image generation, for example. (optional)",   
+        "ResponseFormat": "Valid values are: Json | Text (optional)",   
+        "SystemMessage": "The system message (optional)",   
+        "Stop": ["An array of stop strings", "..."],   
+        "Tools": [  
+            {  
+                "Type": "function",   
+                "Function": {   
+                    "Name": "The name of the tool.",   
+                    "Description": "A description of the tool. (optional)",   
+                    "Parameters": {   
+                        "type": "object",   
+                        "properties": {   
+                            "propertyName": {   
+                                "type": "string",   
+                                "description": "A description of the property. (optional)"   
+                            } 
+                        },  
+                        "required": ["propertyName"]  
+                    } 
+                },  
+                "ExecutionUrl": "If provided, sends the arguments for this tool to the provided URL. (optional)",   
+                "ExecutionMethod": "The kind of method to execute at the Execution URL. Valid values are GET | POST | PUT | PATCH | DELETE (optional)",   
+                "ExecutionBase64Key": "A base64 encoded key that can be used to perform basic authentication at the ExecutionURL. (optional)"   
+            } 
+        ],  
+        "MaxMessageHistory": "The maximum number of past messages to include based on the data associated with the ConversationId. (optional)",   
+        "ReferenceProfiles": ["An array of profile names that will be provided in a system tool, allowing models to continue the conversation before returning a response. (optional)", "..."]  
+    },  
+    "Messages": [  
+        {  
+            "Role": "User | Assistant | System | Tool",   
+            "Content": "The content of the message.",   
+            "Base64Image": "An base64 encoded image string. (optional)",   
+            "TimeStamp": "DateTime (UTC). (optional)"   
+        } 
+    ] 
+}</code></pre>
+      </div>
+      <p><strong>Responses:</strong></p>
+      <ul>
+        <li><code>200 OK</code>: Returns the chat completion response. Schema: <code>CompletionResponse</code></li>
+        <li><code>400 Bad Request</code>: Request payload fails validation.</li>
+        <li><code>404 Not Found</code>: Profile or resource not found.</li>
+        <li><code>429 Too Many Requests</code>: Rate limits exceeded.</li>
+        <li><code>500 Internal Server Error</code>: Unexpected server error.</li>
+      </ul>
+      <p><strong>Example Request:</strong></p>
+      <div class="code-block">
+        <button class="copy-btn">Copy</button>
+        <pre><code class="language-bash">curl -X POST "https://yourapi.com/Completion/Chat/ChatProfile" \
+  -H "Authorization: Bearer {token}" \
+  -H "Content-Type: application/json" \
+  -d '{  "ConversationId": "d290f1ee-6c54-4b01-90e6-d701748f0851", "ProfileOptions": { "Name": "ChatProfile", "Model": "gpt-4o", "Host": "OpenAI", "Temperature": 0.7, "MaxTokens": 150 }, "Messages": [ { "Role": "User", "Content": "Hello, how are you?" } ] }'</code></pre>
+      </div>
+      <p><strong>Example Response:</strong></p>
+      <div class="code-block">
+        <button class="copy-btn">Copy</button>
+        <pre><code class="language-json">{
+    "Messages": [
+        {
+            "Role": "Assistant",
+            "Content": "I'm good! How can I assist you today?"
+        }
+    ],
+    "ToolCalls": {},
+    "ToolExecutionResponses": [],
+    "FinishReason": "Stop | Length | ToolCalls | ContentFilter | TooManyRequests | Error"
+}</code></pre>
+      </div>
+
+      <h4>2. Chat Request (SSE Streaming)</h4>
+      <p><strong>HTTP Request:</strong> <span class="method post">POST</span> <code>/Completion/SSE/{name?}</code></p>
+      <p><strong>Description:</strong> Processes a chat request and returns the result via SSE.</p>
+      <p><strong>Route Parameters:</strong></p>
+      <ul>
+        <li><code>name</code> (string): Profile name for the request. Defaults to <code>ProfileOptions.Name</code> in the request body if not provided.</li>
+      </ul>
+      <p><strong>Request Body:</strong></p>
+      <p>Refer to the <code>Completions/Chat/{profileName}</code> request payload above.</p>
+      <p><strong>Response:</strong></p>
+      <ul>
+        <li><strong>Content-Type:</strong> <code>text/event-stream</code></li>
+        <li><strong>Response Format:</strong> Streamed in chunks of <code>CompletionStreamChunk</code>.</li>
+      </ul>
+      <p><strong>Response Codes:</strong></p>
+      <ul>
+        <li><code>200 OK</code>: Stream initiated successfully.</li>
+        <li><code>400 Bad Request</code>: Request payload fails validation.</li>
+        <li><code>404 Not Found</code>: Profile or resource not found.</li>
+        <li><code>429 Too Many Requests</code>: Rate limits exceeded.</li>
+        <li><code>500 Internal Server Error</code>: Unexpected server error.</li>
+      </ul>
+      <p><strong>Example Request:</strong></p>
+      <div class="code-block">
+        <button class="copy-btn">Copy</button>
+        <pre><code class="language-bash">curl -X POST "https://yourapi.com/Completion/SSE/ChatProfile" \
+  -H "Authorization: Bearer {token}" \
+  -H "Content-Type: application/json" \
+  -N \
+  -d '{ "ProfileOptions": { "Name": "ChatProfile", "Model": "gpt-4o", "Host": "OpenAI", "Temperature": 0.7, "MaxTokens": 150 }, "Messages": [ { "Role": "User", "Content": "Hello, stream my response!" } ] }'</code></pre>
+      </div>
+      <p><strong>Example SSE Response:</strong></p>
+      <div class="code-block">
+        <button class="copy-btn">Copy</button>
+        <pre><code class="language-bash">data: { "chunkProperty": "chunkValue", ... }
+data: { "chunkProperty": "chunkValue", ... }</code></pre>
+      </div>
+
+      <h4>Error Handling</h4>
+      <p>The API uses standard HTTP status codes to indicate the result of the operation:</p>
+      <ul>
+        <li><code>400 Bad Request</code>: Issues with validation.</li>
+        <li><code>404 Not Found</code>: Profile or resource not found.</li>
+        <li><code>429 Too Many Requests</code>: Rate limits exceeded.</li>
+        <li><code>500 Internal Server Error</code>: Unexpected server error.</li>
+      </ul>
+
+      <h4>Summary</h4>
+      <ul>
+        <li>Use <strong>POST</strong> <code>/Completion/Chat/{name?}</code> for standard chat completions.</li>
+        <li>Use <strong>POST</strong> <code>/Completion/SSE/{name?}</code> to receive a streaming response via SSE.</li>
+        <li>Validate that the <code>CompletionRequest</code> object contains a valid <code>ProfileOptions</code> and a non-empty <code>Messages</code> array.</li>
+        <li>Handle responses according to the status codes provided.</li>
+      </ul>
+
+      <h3>ChatHub (SignalR Hub)</h3>
+      <p><strong>Base URL</strong> <code>/ChatStream</code></p>
+      <p>The <code>ChatHub</code> is a SignalR hub designed to stream chat completion responses to connected clients.</p>
+
+      <h4>1. Send(CompletionRequest completionRequest)</h4>
+      <p><strong>Description:</strong> Sends a chat completion request and streams response chunks back to the client.</p>
+      <p><strong>Parameters:</strong> Refer to the <code>Completions/Chat/{profileName}</code> request payload above.</p>
+      <p><strong>Returns:</strong> An asynchronous <code>Task</code> streaming response chunks using SignalR.</p>
+      <p><strong>Workflow:</strong></p>
+      <ol>
+        <li><strong>Validation</strong>:
+          <ul>
+            <li>Validates the request.</li>
+            <li>If validation fails, an error is sent to the client.</li>
+          </ul>
+        </li>
+        <li><strong>Processing</strong>:
+          <ul>
+            <li>If validation passes, initiates the chat completion process.</li>
+          </ul>
+        </li>
+        <li><strong>Response Streaming</strong>:
+          <ul>
+            <li>Streams response chunks to the client.</li>
+          </ul>
+        </li>
+      </ol>
+
+      <p><strong>C# Usage Example:</strong></p>
+      <div class="code-block">
+        <button class="copy-btn">Copy</button>
+        <pre><code class="language-csharp">// Create a new completion request  
+var request = new CompletionRequest 
+{
+    ConversationId = Guid.NewGuid(), 
+    ProfileOptions = new Profile  
+    { 
+        Name = "DefaultProfileName",  
+        Temperature = 0.7f,  
+        MaxTokens = 150   
+    }, 
+    Messages = new List<Message>  
+    {  
+        new Message  
+        { 
+            Role = Role.User, 
+            Content = "Hello, can you assist me with my query?"   
+        } 
+    } 
+};
+// Invoke the Send method on the ChatHub using SignalR  
+await hubConnection.InvokeAsync("Send", request);</code></pre>
+      </div>
+
+      <h4>Notes</h4>
+      <ul>
+        <li><strong>Validation:</strong> The <code>ChatHub</code> validates incoming <code>CompletionRequest</code> objects. Validation errors result in immediate responses to the client.</li>
+        <li><strong>Streaming:</strong> Responses are streamed back to the client in chunks. Each chunk includes a status code and possibly error messages.</li>
+      </ul>
+
+      <h3>Profile API Reference</h3>
+      <p><strong>Base URL</strong> <code>/Profile</code></p>
+      <p>The <code>ProfileController</code> manages agent profiles. It provides endpoints for retrieving, creating/updating, associating/dissociating tools, and deleting profiles.</p>
+
+      <h4>1. Get Profile By Name</h4>
+      <p><strong>HTTP Request:</strong> <span class="method get">GET</span> <code>/Profile/get/{name}</code></p>
+      <p><strong>Description:</strong> Retrieves the profile associated with the specified <code>name</code>.</p>
+      <p><strong>Route Parameters:</strong></p>
+      <ul>
+        <li><code>name</code> (string): The name of the agent profile.</li>
+      </ul>
+      <p><strong>Responses:</strong></p>
+      <ul>
+        <li><code>200 OK</code>: Returns the profile object. Schema: <code>Profile</code></li>
+        <li><code>400 Bad Request</code>: Invalid route parameter.</li>
+        <li><code>404 Not Found</code>: Profile not found.</li>
+        <li><code>500 Internal Server Error</code>: Unexpected server error.</li>
+      </ul>
+      <p><strong>Example Request:</strong></p>
+      <div class="code-block">
+        <button class="copy-btn">Copy</button>
+        <pre><code class="language-bash">GET https://yourapi.com/Profile/get/ChatProfile</code></pre>
+      </div>
+      <p><strong>Example Response:</strong></p>
+      <div class="code-block">
+        <button class="copy-btn">Copy</button>
+        <pre><code class="language-json">{   
+    "Name": "ProfileName",   
+    "Model": "gpt4o",   
+    "Host": "OpenAI",   
+    "ImageHost": "OpenAI",   
+    "RagDatabase": "MyRagIndex",   
+    "FrequencyPenalty": 0.5,   
+    "PresencePenalty": 0.5,   
+    "Temperature": 0.5,   
+    "TopP": 0.5,
+    "MaxTokens": 4000,
+    "TopLogprobs": 2,   
+    "Logprobs": true,   
+    "User": "Jacob",   
+    "ToolChoice": "TestTool",   
+    "ResponseFormat": "Text",   
+    "SystemMessage": "You are an example assistant.",   
+    "Stop": ["string", "another string"],   
+    "Tools": [  
+        {  
+            "Type": "function",   
+            "Function": {   
+                "Name": "TestTool",   
+                "Description": "A tool description for example purposes. This will be sent to example.com",   
+                "Parameters": {   
+                    "type": "object",   
+                    "properties": {   
+                        "anExampleProperty": {   
+                            "type": "string",   
+                            "description": "An example description of the property."   
+                        } 
+                    },  
+                    "required": ["anExampleProperty"]  
+                } 
+            },  
+            "ExecutionUrl": "https://example.com",   
+            "ExecutionMethod": "POST",   
+            "ExecutionBase64Key": "A base key"   
+        } 
+    ],  
+    "MaxMessageHistory": 20,   
+    "ReferenceProfiles": ["ProfileName", "AnotherProfile"]  
+}</code></pre>
+      </div>
+
+      <h4>2. Get All Profiles</h4>
+      <p><strong>HTTP Request:</strong> <span class="method get">GET</span> <code>/Profile/get/all/page/{page}/count/{count}</code></p>
+      <p><strong>Description:</strong> Retrieves a paginated list of profiles.</p>
+      <p><strong>Route Parameters:</strong></p>
+      <ul>
+        <li><code>page</code> (integer): The page number to retrieve (must be ≥ 1).</li>
+        <li><code>count</code> (integer): The number of profiles per page (must be ≥ 1).</li>
+      </ul>
+      <p><strong>Responses:</strong></p>
+      <ul>
+        <li><code>200 OK</code>: Returns a list of profile objects.</li>
+        <li><code>400 Bad Request</code>: Invalid pagination parameters.</li>
+        <li><code>500 Internal Server Error</code>: Unexpected server error.</li>
+      </ul>
+      <p><strong>Example Request:</strong></p>
+      <div class="code-block">
+        <button class="copy-btn">Copy</button>
+        <pre><code class="language-bash">GET https://yourapi.com/Profile/get/all/page/1/count/10</code></pre>
+      </div>
+      <p><strong>Example Response:</strong></p>
+      <div class="code-block">
+        <button class="copy-btn">Copy</button>
+        <pre><code class="language-json">[
+    {   
+        "Name": "ProfileName",   
+        "Model": "gpt4o",   
+        "Host": "OpenAI",   
+        "ImageHost": "OpenAI",   
+        "RagDatabase": "MyRagIndex",   
+        "FrequencyPenalty": 0.5,   
+        "PresencePenalty": 0.5,   
+        "Temperature": 0.5,   
+        "TopP": 0.5,
+        "MaxTokens": 4000,
+        "TopLogprobs": 2,   
+        "Logprobs": true,   
+        "User": "Jacob",   
+        "ToolChoice": "TestTool",   
+        "ResponseFormat": "Text",   
+        "SystemMessage": "You are an example assistant.",   
+        "Stop": ["string", "another string"],   
+        "Tools": [  
+            {  
+                "Type": "function",   
+                "Function": {   
+                    "Name": "TestTool",   
+                    "Description": "A tool description for example purposes. This will be sent to example.com",   
+                    "Parameters": {   
+                        "type": "object",   
+                        "properties": {   
+                            "anExampleProperty": {   
+                                "type": "string",   
+                                "description": "An example description of the property."   
+                            } 
+                        },  
+                        "required": ["anExampleProperty"]  
+                    } 
+                },  
+                "ExecutionUrl": "https://example.com",   
+                "ExecutionMethod": "POST",   
+                "ExecutionBase64Key": "A base key"   
+            } 
+        ],  
+        "MaxMessageHistory": 20,   
+        "ReferenceProfiles": ["ProfileName", "AnotherProfile"]  
+    },
+    {   
+        "Name": "AnotherProfile",   
+        "Model": "gpt4o",   
+        "Host": "OpenAI",   
+        "ImageHost": "OpenAI",   
+        "RagDatabase": "MyRagIndex",   
+        "FrequencyPenalty": 0.5,   
+        "PresencePenalty": 0.5,   
+        "Temperature": 0.5,   
+        "TopP": 0.5,
+        "MaxTokens": 4000,
+        "TopLogprobs": 2,   
+        "Logprobs": true,   
+        "User": "Jacob",   
+        "ToolChoice": "TestTool",   
+        "ResponseFormat": "Text",   
+        "SystemMessage": "You are an example assistant.",   
+        "Stop": ["string", "another string"],   
+        "Tools": [  
+            {  
+                "Type": "function",   
+                "Function": {   
+                    "Name": "TestTool",   
+                    "Description": "A tool description for example purposes. This will be sent to example.com",   
+                    "Parameters": {   
+                        "type": "object",   
+                        "properties": {   
+                            "anExampleProperty": {   
+                                "type": "string",   
+                                "description": "An example description of the property."   
+                            } 
+                        },  
+                        "required": ["anExampleProperty"]  
+                    } 
+                },  
+                "ExecutionUrl": "https://example.com",   
+                "ExecutionMethod": "POST",   
+                "ExecutionBase64Key": "A base key"   
+            } 
+        ],  
+        "MaxMessageHistory": 20,   
+        "ReferenceProfiles": ["ProfileName", "AnotherProfile"]  
+    }
+]</code></pre>
+      </div>
+
+      <h4>3. Create or Update Profile</h4>
+      <p><strong>HTTP Request:</strong> <span class="method post">POST</span> <code>/Profile/upsert</code></p>
+      <p><strong>Description:</strong> Creates a new profile or updates an existing one.</p>
+      <p><strong>Request Body:</strong></p>
+      <p>Refer to the <code>Completions/Chat/{profileName}</code> request payload above.</p>
+      <p><strong>Responses:</strong></p>
+      <ul>
+        <li><code>200 OK</code>: Returns the newly created or updated profile. Schema: <code>Profile</code></li>
+        <li><code>400 Bad Request</code>: Request payload fails validation.</li>
+        <li><code>500 Internal Server Error</code>: Unexpected server error.</li>
+      </ul>
+      <p><strong>Example Request:</strong></p>
+      <p><code>POST https://yourapi.com/Profile/upsert</code></p>
+      <p>See the request payload at <code>Completions/Chat/{profileName}</code>.</p>
+      <p><strong>Example Response:</strong></p>
+      <div class="code-block">
+        <button class="copy-btn">Copy</button>
+        <pre><code class="language-json">{   
+    "Name": "ProfileName",   
+    "Model": "gpt4o",   
+    "Host": "OpenAI",   
+    "ImageHost": "OpenAI",   
+    "RagDatabase": "MyRagIndex",   
+    "FrequencyPenalty": 0.5,   
+    "PresencePenalty": 0.5,   
+    "Temperature": 0.5,   
+    "TopP": 0.5,
+    "MaxTokens": 4000,
+    "TopLogprobs": 2,   
+    "Logprobs": true,   
+    "User": "Jacob",   
+    "ToolChoice": "TestTool",   
+    "ResponseFormat": "Text",   
+    "SystemMessage": "You are an example assistant.",   
+    "Stop": ["string", "another string"],   
+    "Tools": [  
+        {  
+            "Type": "function",   
+            "Function": {   
+                "Name": "TestTool",   
+                "Description": "A tool description for example purposes. This will be sent to example.com",   
+                "Parameters": {   
+                    "type": "object",   
+                    "properties": {   
+                        "anExampleProperty": {   
+                            "type": "string",   
+                            "description": "An example description of the property."   
+                        } 
+                    },  
+                    "required": ["anExampleProperty"]  
+                } 
+            },  
+            "ExecutionUrl": "https://example.com",   
+            "ExecutionMethod": "POST",   
+            "ExecutionBase64Key": "A base key"   
+        } 
+    ],  
+    "MaxMessageHistory": 20,   
+    "ReferenceProfiles": ["ProfileName", "AnotherProfile"]  
+}</code></pre>
+      </div>
+
+      <h4>4. Associate Profile with Tools</h4>
+      <p><strong>HTTP Request:</strong> <span class="method post">POST</span> <code>/Profile/associate/{name}</code></p>
+      <p><strong>Description:</strong> Associates the specified profile with one or more tools available in the database.</p>
+      <p><strong>Route Parameters:</strong></p>
+      <ul>
+        <li><code>name</code> (string): The name of the profile.</li>
+      </ul>
+      <p><strong>Request Body:</strong></p>
+      <div class="code-block">
+        <button class="copy-btn">Copy</button>
+        <pre><code class="language-json">["Tool1", "Tool2"]</code></pre>
+      </div>
+      <p><strong>Responses:</strong></p>
+      <ul>
+        <li><code>200 OK</code>: Returns a list of tools successfully associated with the profile.</li>
+        <li><code>400 Bad Request</code>: Invalid profile name or tools list.</li>
+        <li><code>404 Not Found</code>: Profile not found.</li>
+        <li><code>500 Internal Server Error</code>: Unexpected server error.</li>
+      </ul>
+      <p><strong>Example Request:</strong></p>
+      <div class="code-block">
+        <button class="copy-btn">Copy</button>
+        <pre><code class="language-bash">curl -X POST "https://yourapi.com/Profile/associate/ChatProfile" \
+     -H "Content-Type: application/json" \
+     -d '["Tool1", "Tool2"]'</code></pre>
+      </div>
+      <p><strong>Example Response:</strong></p>
+      <div class="code-block">
+        <button class="copy-btn">Copy</button>
+        <pre><code class="language-json">["Tool1", "Tool2"]</code></pre>
+      </div>
+
+      <h4>5. Dissociate Profile from Tools</h4>
+      <p><strong>HTTP Request:</strong> <span class="method post">POST</span> <code>/Profile/dissociate/{name}</code></p>
+      <p><strong>Description:</strong> Dissociates one or more tools from the specified profile.</p>
+      <p><strong>Route Parameters:</strong></p>
+      <ul>
+        <li><code>name</code> (string): The name of the profile.</li>
+      </ul>
+      <p><strong>Request Body:</strong></p>
+      <div class="code-block">
+        <button class="copy-btn">Copy</button>
+        <pre><code class="language-json">["Tool1", "Tool2"]</code></pre>
+      </div>
+      <p><strong>Responses:</strong></p>
+      <ul>
+        <li><code>200 OK</code>: Returns a list of tools successfully dissociated from the profile.</li>
+        <li><code>400 Bad Request</code>: Invalid profile name or tools list.</li>
+        <li><code>404 Not Found</code>: Profile or tools association not found.</li>
+        <li><code>500 Internal Server Error</code>: Unexpected server error.</li>
+      </ul>
+      <p><strong>Example Request:</strong></p>
+      <div class="code-block">
+        <button class="copy-btn">Copy</button>
+        <pre><code class="language-bash">curl -X POST "https://yourapi.com/Profile/dissociate/ChatProfile" \
+     -H "Content-Type: application/json" \
+     -d '["Tool1", "Tool2"]'</code></pre>
+      </div>
+      <p><strong>Example Response:</strong></p>
+      <div class="code-block">
+        <button class="copy-btn">Copy</button>
+        <pre><code class="language-json">["Tool1", "Tool2"]</code></pre>
+      </div>
+
+      <h4>6. Delete Profile</h4>
+      <p><strong>HTTP Request:</strong> <span class="method delete">DELETE</span> <code>/Profile/delete/{name}</code></p>
+      <p><strong>Description:</strong> Deletes the specified profile.</p>
+      <p><strong>Route Parameters:</strong></p>
+      <ul>
+        <li><code>name</code> (string): The name of the profile to delete.</li>
+      </ul>
+      <p><strong>Responses:</strong></p>
+      <ul>
+        <li><code>204 No Content</code>: Profile deleted successfully.</li>
+        <li><code>400 Bad Request</code>: Invalid profile name.</li>
+        <li><code>404 Not Found</code>: Profile not found.</li>
+        <li><code>500 Internal Server Error</code>: Unexpected server error.</li>
+      </ul>
+      <p><strong>Example Request:</strong></p>
+      <div class="code-block">
+        <button class="copy-btn">Copy</button>
+        <pre><code class="language-bash">curl -X DELETE "https://yourapi.com/Profile/delete/ChatProfile"</code></pre>
+      </div>
+      <p><strong>Example Response:</strong> <em>No content</em></p>
+
+      <h3>Tool API Reference</h3>
+      <p><strong>Base URL</strong> <code>/Tool</code></p>
+      <p>The <code>ToolController</code> manages agent tools. It provides endpoints for retrieving individual tools, listing all tools, managing tool-profile associations, creating or updating tools, and deleting tools.</p>
+
+      <h4>1. Get Tool By Name</h4>
+      <p><strong>HTTP Request:</strong> <span class="method get">GET</span> <code>/Tool/get/{name}</code></p>
+      <p><strong>Description:</strong> Retrieves the tool associated with the specified <code>name</code>.</p>
+      <p><strong>Route Parameters:</strong></p>
+      <ul>
+        <li><code>name</code> (string): The name of the tool.</li>
+      </ul>
+      <p><strong>Responses:</strong></p>
+      <ul>
+        <li><code>200 OK</code>: Returns the tool object. Schema: <code>Tool</code></li>
+        <li><code>400 Bad Request</code>: Invalid tool name.</li>
+        <li><code>404 Not Found</code>: Tool not found.</li>
+        <li><code>500 Internal Server Error</code>: Unexpected server error.</li>
+      </ul>
+      <p><strong>Example Request:</strong></p>
+      <div class="code-block">
+        <button class="copy-btn">Copy</button>
+        <pre><code class="language-bash">GET https://yourapi.com/Tool/get/ImageProcessor</code></pre>
+      </div>
+      <p><strong>Example Response:</strong></p>
+      <div class="code-block">
+        <button class="copy-btn">Copy</button>
+        <pre><code class="language-json">{  
+    "Type": "function",   
+    "Function": {   
+        "Name": "TestTool",   
+        "Description": "A tool description for example purposes. This will be sent to example.com",   
+        "Parameters": {   
+            "type": "object",   
+            "properties": {   
+                "anExampleProperty": {   
+                    "type": "string",   
+                    "description": "An example description of the property."   
+                } 
+            },  
+            "required": ["anExampleProperty"]  
+        } 
+    },  
+    "ExecutionUrl": "https://example.com",   
+    "ExecutionMethod": "POST",   
+    "ExecutionBase64Key": "A base key"   
+}</code></pre>
+      </div>
+
+      <h4>2. Get All Tools</h4>
+      <p><strong>HTTP Request:</strong> <span class="method get">GET</span> <code>/Tool/get/all/page/{page}/count/{count}</code></p>
+      <p><strong>Description:</strong> Retrieves a paginated list of tools.</p>
+      <p><strong>Route Parameters:</strong></p>
+      <ul>
+        <li><code>page</code> (integer): The page number to retrieve (must be ≥ 1).</li>
+        <li><code>count</code> (integer): The number of tools per page (must be ≥ 1).</li>
+      </ul>
+      <p><strong>Responses:</strong></p>
+      <ul>
+        <li><code>200 OK</code>: Returns a list of tool objects.</li>
+        <li><code>400 Bad Request</code>: Invalid pagination parameters.</li>
+        <li><code>500 Internal Server Error</code>: Unexpected server error.</li>
+      </ul>
+      <p><strong>Example Request:</strong></p>
+      <div class="code-block">
+        <button class="copy-btn">Copy</button>
+        <pre><code class="language-bash">GET https://yourapi.com/Tool/get/all/page/1/count/10</code></pre>
+      </div>
+      <p><strong>Example Response:</strong></p>
+      <div class="code-block">
+        <button class="copy-btn">Copy</button>
+        <pre><code class="language-json">[
+    {  
+        "Type": "function",   
+        "Function": {   
+            "Name": "TestTool",   
+            "Description": "A tool description for example purposes. This will be sent to example.com",   
+            "Parameters": {   
+                "type": "object",   
+                "properties": {   
+                    "anExampleProperty": {   
+                        "type": "string",   
+                        "description": "An example description of the property."   
+                    } 
+                },  
+                "required": ["anExampleProperty"]  
+            } 
+        },  
+        "ExecutionUrl": "https://example.com",   
+        "ExecutionMethod": "POST",   
+        "ExecutionBase64Key": "A base key"   
+    },
+    {  
+        "Type": "function",   
+        "Function": {   
+            "Name": "TestTool",   
+            "Description": "A tool description for example purposes. This will be sent to example.com",   
+            "Parameters": {   
+                "type": "object",   
+                "properties": {   
+                    "anExampleProperty": {   
+                        "type": "string",   
+                        "description": "An example description of the property."   
+                    } 
+                },  
+                "required": ["anExampleProperty"]  
+            } 
+        },  
+        "ExecutionUrl": "https://example.com",   
+        "ExecutionMethod": "POST",   
+        "ExecutionBase64Key": "A base key"   
+    } 
+]</code></pre>
+      </div>
+
+      <h4>3. Get Tool Profiles</h4>
+      <p><strong>HTTP Request:</strong> <span class="method get">GET</span> <code>/Tool/get/{name}/profiles</code></p>
+      <p><strong>Description:</strong> Retrieves a list of profile names associated with the specified tool.</p>
+      <p><strong>Route Parameters:</strong></p>
+      <ul>
+        <li><code>name</code> (string): The name of the tool.</li>
+      </ul>
+      <p><strong>Responses:</strong></p>
+      <ul>
+        <li><code>200 OK</code>: Returns a list of profile names that use the tool.</li>
+        <li><code>400 Bad Request</code>: Invalid tool name.</li>
+        <li><code>500 Internal Server Error</code>: Unexpected server error.</li>
+      </ul>
+      <p><strong>Example Request:</strong></p>
+      <div class="code-block">
+        <button class="copy-btn">Copy</button>
+        <pre><code class="language-bash">GET https://yourapi.com/Tool/get/ImageProcessor/profiles</code></pre>
+      </div>
+      <p><strong>Example Response:</strong></p>
+      <div class="code-block">
+        <button class="copy-btn">Copy</button>
+        <pre><code class="language-json">[ "ChatProfile", "ImageAssistant" ]</code></pre>
+      </div>
+
+      <h4>4. Create or Update Tools</h4>
+      <p><strong>HTTP Request:</strong> <span class="method post">POST</span> <code>/Tool/upsert</code></p>
+      <p><strong>Description:</strong> Creates new tool definitions or updates existing ones.</p>
+      <p><strong>Request Body:</strong></p>
+      <div class="code-block">
+        <button class="copy-btn">Copy</button>
+        <pre><code class="language-json">[
+    {  
+        "Type": "function",   
+        "Function": {   
+            "Name": "TestTool",   
+            "Description": "A tool description for example purposes. This will be sent to example.com",   
+            "Parameters": {   
+                "type": "object",   
+                "properties": {   
+                    "anExampleProperty": {   
+                        "type": "string",   
+                        "description": "An example description of the property."   
+                    } 
+                },  
+                "required": ["anExampleProperty"]  
+            } 
+        },  
+        "ExecutionUrl": "https://example.com",   
+        "ExecutionMethod": "POST",   
+        "ExecutionBase64Key": "A base key"   
+    },
+    {  
+        "Type": "function",   
+        "Function": {   
+            "Name": "TestTool",   
+            "Description": "A tool description for example purposes. This will be sent to example.com",   
+            "Parameters": {   
+                "type": "object",   
+                "properties": {   
+                    "anExampleProperty": {   
+                        "type": "string",   
+                        "description": "An example description of the property."   
+                    } 
+                },  
+                "required": ["anExampleProperty"]  
+            } 
+        },  
+        "ExecutionUrl": "https://example.com",   
+        "ExecutionMethod": "POST",   
+        "ExecutionBase64Key": "A base key"   
+    } 
+]</code></pre>
+      </div>
+      <p><strong>Responses:</strong></p>
+      <ul>
+        <li><code>200 OK</code>: Returns the updated list of tool objects.</li>
+        <li><code>400 Bad Request</code>: Request payload fails validation.</li>
+        <li><code>500 Internal Server Error</code>: Unexpected server error.</li>
+      </ul>
+      <p><strong>Example Request:</strong></p>
+      <div class="code-block">
+        <button class="copy-btn">Copy</button>
+        <pre><code class="language-bash">curl -X POST "https://yourapi.com/Tool/upsert" \
+     -H "Content-Type: application/json" \
+     -d '[ { "Type": "function", "Function": { "Name": "TestTool", "Description": "A tool description for example purposes. This will be sent to example.com", "Parameters": { "type": "object", "properties": { "anExampleProperty": { "type": "string", "description": "An example description of the property." } }, "required": ["anExampleProperty"] } }, "ExecutionUrl": "https://example.com", "ExecutionMethod": "POST", "ExecutionBase64Key": "A base key" } ]'</code></pre>
+      </div>
+      <p><strong>Example Response:</strong></p>
+      <div class="code-block">
+        <button class="copy-btn">Copy</button>
+        <pre><code class="language-json">[
+    {  
+        "Type": "function",   
+        "Function": {   
+            "Name": "TestTool",   
+            "Description": "A tool description for example purposes. This will be sent to example.com",   
+            "Parameters": {   
+                "type": "object",   
+                "properties": {   
+                    "anExampleProperty": {   
+                        "type": "string",   
+                        "description": "An example description of the property."   
+                    } 
+                },  
+                "required": ["anExampleProperty"]  
+            } 
+        },  
+        "ExecutionUrl": "https://example.com",   
+        "ExecutionMethod": "POST",   
+        "ExecutionBase64Key": "A base key"   
+    }
+]</code></pre>
+      </div>
+
+      <h4>5. Associate Tool with Profiles</h4>
+      <p><strong>HTTP Request:</strong> <span class="method post">POST</span> <code>/Tool/associate/{name}</code></p>
+      <p><strong>Description:</strong> Associates the specified tool with one or more profiles.</p>
+      <p><strong>Route Parameters:</strong></p>
+      <ul>
+        <li><code>name</code> (string): The name of the tool.</li>
+      </ul>
+      <p><strong>Request Body:</strong></p>
+      <div class="code-block">
+        <button class="copy-btn">Copy</button>
+        <pre><code class="language-json">["ChatProfile", "ImageAssistant"]</code></pre>
+      </div>
+      <p><strong>Responses:</strong></p>
+      <ul>
+        <li><code>200 OK</code>: Returns a list of profile names successfully associated with the tool.</li>
+        <li><code>400 Bad Request</code>: Invalid tool name or profiles list.</li>
+        <li><code>404 Not Found</code>: Tool or profile not found.</li>
+        <li><code>500 Internal Server Error</code>: Unexpected server error.</li>
+      </ul>
+      <p><strong>Example Request:</strong></p>
+      <div class="code-block">
+        <button class="copy-btn">Copy</button>
+        <pre><code class="language-bash">curl -X POST "https://yourapi.com/Tool/associate/ImageProcessor" \
+     -H "Content-Type: application/json" \
+     -d '["ChatProfile", "ImageAssistant"]'</code></pre>
+      </div>
+      <p><strong>Example Response:</strong></p>
+      <div class="code-block">
+        <button class="copy-btn">Copy</button>
+        <pre><code class="language-json">["ChatProfile", "ImageAssistant"]</code></pre>
+      </div>
+
+      <h4>6. Dissociate Tool from Profiles</h4>
+      <p><strong>HTTP Request:</strong> <span class="method post">POST</span> <code>/Tool/dissociate/{name}</code></p>
+      <p><strong>Description:</strong> Dissociates the specified tool from one or more profiles.</p>
+      <p><strong>Route Parameters:</strong></p>
+      <ul>
+        <li><code>name</code> (string): The name of the tool.</li>
+      </ul>
+      <p><strong>Request Body:</strong></p>
+      <div class="code-block">
+        <button class="copy-btn">Copy</button>
+        <pre><code class="language-json">["ChatProfile", "ImageAssistant"]</code></pre>
+      </div>
+      <p><strong>Responses:</strong></p>
+      <ul>
+        <li><code>200 OK</code>: Returns a list of profile names successfully dissociated from the tool.</li>
+        <li><code>400 Bad Request</code>: Invalid tool name or profiles list.</li>
+        <li><code>404 Not Found</code>: Tool or association not found.</li>
+        <li><code>500 Internal Server Error</code>: Unexpected server error.</li>
+      </ul>
+      <p><strong>Example Request:</strong></p>
+      <div class="code-block">
+        <button class="copy-btn">Copy</button>
+        <pre><code class="language-bash">curl -X POST "https://yourapi.com/Tool/dissociate/ImageProcessor" \
+     -H "Content-Type: application/json" \
+     -d '["ChatProfile", "ImageAssistant"]'</code></pre>
+      </div>
+      <p><strong>Example Response:</strong></p>
+      <div class="code-block">
+        <button class="copy-btn">Copy</button>
+        <pre><code class="language-json">["ChatProfile", "ImageAssistant"]</code></pre>
+      </div>
+
+      <h4>7. Delete Tool</h4>
+      <p><strong>HTTP Request:</strong> <span class="method delete">DELETE</span> <code>/Tool/delete/{name}</code></p>
+      <p><strong>Description:</strong> Deletes the specified tool.</p>
+      <p><strong>Route Parameters:</strong></p>
+      <ul>
+        <li><code>name</code> (string): The name of the tool to delete.</li>
+      </ul>
+      <p><strong>Responses:</strong></p>
+      <ul>
+        <li><code>204 No Content</code>: Tool deleted successfully.</li>
+        <li><code>400 Bad Request</code>: Invalid tool name.</li>
+        <li><code>404 Not Found</code>: Tool not found.</li>
+        <li><code>500 Internal Server Error</code>: Unexpected server error.</li>
+      </ul>
+      <p><strong>Example Request:</strong></p>
+      <div class="code-block">
+        <button class="copy-btn">Copy</button>
+        <pre><code class="language-bash">curl -X DELETE "https://yourapi.com/Tool/delete/ImageProcessor"</code></pre>
+      </div>
+      <p><strong>Example Response:</strong> <em>No content</em></p>
+
+      <h3>Message History API Reference</h3>
+      <p><strong>Base URL</strong> <code>/MessageHistory</code></p>
+      <p>The Message History API provides endpoints to manage message histories. You can retrieve messages, update or create a message history, delete an entire message history, add individual messages, or remove specific messages.</p>
+
+      <h4>1. Get Message History</h4>
+      <p><strong>HTTP Request:</strong> <span class="method get">GET</span> <code>/MessageHistory/{id}</code></p>
+      <p><strong>Description:</strong> Retrieves the message history for the specified message history identifier.</p>
+      <p><strong>Route Parameters:</strong></p>
+      <ul>
+        <li><code>id</code> (string): The unique identifier for the message history.</li>
+      </ul>
+      <p><strong>Query Parameters:</strong></p>
+      <ul>
+        <li><code>count</code> (integer, required): Number of messages to retrieve.</li>
+        <li><code>page</code> (integer, required): Page offset for pagination.</li>
+      </ul>
+      <p><strong>Responses:</strong></p>
+      <ul>
+        <li><code>200 OK</code>: Returns a list of message objects.</li>
+        <li><code>400 Bad Request</code>: If parameters are invalid.</li>
+        <li><code>404 Not Found</code>: If the message history is not found.</li>
+      </ul>
+      <p><strong>Example Response:</strong></p>
+      <div class="code-block">
+        <button class="copy-btn">Copy</button>
+        <pre><code class="language-json">{
+    "status": "Ok",
+    "data": [
+        {
+            "Role": "User",
+            "Content": "Hello, how can I help you?",
+            "Base64Image": null,
+            "TimeStamp": "2025-03-05T12:34:56Z"
+        },
+        {
+            "Role": "Assistant",
+            "Content": "I need assistance with my order.",
+            "Base64Image": null,
+            "TimeStamp": "2025-03-05T12:35:10Z"
+        }
+    ]
+}</code></pre>
+      </div>
+
+      <h4>2. Update or Create Message History</h4>
+      <p><strong>HTTP Request:</strong> <span class="method post">POST</span> <code>/MessageHistory/{messageHistoryId}</code></p>
+      <p><strong>Description:</strong> Validates and updates (or creates) a message history by adding the provided list of messages.</p>
+      <p><strong>Route Parameters:</strong></p>
+      <ul>
+        <li><code>messageHistoryId</code> (string): The unique identifier for the message history.</li>
+      </ul>
+      <p><strong>Request Body:</strong></p>
+      <div class="code-block">
+        <button class="copy-btn">Copy</button>
+        <pre><code class="language-json">[
+    {
+        "Role": "User",
+        "Content": "What is the status of my order?",
+        "Base64Image": null,
+        "TimeStamp": "2025-03-05T12:40:00Z"
+    },
+    {
+        "Role": "Assistant",
+        "Content": "Your order is being processed.",
+        "Base64Image": null,
+        "TimeStamp": "2025-03-05T12:41:00Z"
+    }
+]</code></pre>
+      </div>
+      <p><strong>Responses:</strong></p>
+      <ul>
+        <li><code>200 OK</code>: Returns the successfully added messages.</li>
+        <li><code>400 Bad Request</code>: Validation errors.</li>
+      </ul>
+
+      <h4>3. Delete Message History</h4>
+      <p><strong>HTTP Request:</strong> <span class="method delete">DELETE</span> <code>/MessageHistory/{id}</code></p>
+      <p><strong>Description:</strong> Deletes the entire message history identified by the provided ID.</p>
+      <p><strong>Route Parameters:</strong></p>
+      <ul>
+        <li><code>id</code> (string): The unique identifier for the message history.</li>
+      </ul>
+      <p><strong>Responses:</strong></p>
+      <ul>
+        <li><code>200 OK</code>: Indicates successful deletion.</li>
+        <li><code>404 Not Found</code>: If the message history is not found.</li>
+      </ul>
+      <p><strong>Example Response:</strong></p>
+      <div class="code-block">
+        <button class="copy-btn">Copy</button>
+        <pre><code class="language-json">{
+    "status": "Ok",
+    "data": true
+}</code></pre>
+      </div>
+
+      <h4>4. Add Message to Message History</h4>
+      <p><strong>HTTP Request:</strong> <span class="method post">POST</span> <code>/MessageHistory/{messageHistoryId}/message</code></p>
+      <p><strong>Description:</strong> Adds a single message to an existing message history.</p>
+      <p><strong>Route Parameters:</strong></p>
+      <ul>
+        <li><code>messageHistoryId</code> (string): The unique identifier for the message history.</li>
+      </ul>
+      <p><strong>Request Body:</strong></p>
+      <div class="code-block">
+        <button class="copy-btn">Copy</button>
+        <pre><code class="language-json">{
+    "Role": "User",
+    "Content": "Can I update my shipping address?",
+    "Base64Image": null,
+    "TimeStamp": "2025-03-05T12:45:00Z"
+}</code></pre>
+      </div>
+      <p><strong>Responses:</strong></p>
+      <ul>
+        <li><code>200 OK</code>: Returns the newly added message.</li>
+        <li><code>404 Not Found</code>: If the message history is not found.</li>
+      </ul>
+
+      <h4>5. Delete Message from Message History</h4>
+      <p><strong>HTTP Request:</strong> <span class="method delete">DELETE</span> <code>/MessageHistory/{messageHistoryId}/message/{messageId}</code></p>
+      <p><strong>Description:</strong> Deletes a specific message from the message history.</p>
+      <p><strong>Route Parameters:</strong></p>
+      <ul>
+        <li><code>messageHistoryId</code> (string): The unique identifier for the message history.</li>
+        <li><code>messageId</code> (string): The unique identifier for the message.</li>
+      </ul>
+      <p><strong>Responses:</strong></p>
+      <ul>
+        <li><code>200 OK</code>: Indicates successful deletion.</li>
+        <li><code>404 Not Found</code>: If the message history or message is not found.</li>
+      </ul>
+      <p><strong>Example Response:</strong></p>
+      <div class="code-block">
+        <button class="copy-btn">Copy</button>
+        <pre><code class="language-json">{
+    "status": "Ok",
+    "data": true
+}</code></pre>
+      </div>
+
+      <h3>RAG Index API Reference</h3>
+      <p><strong>Base URL</strong> <code>/Rag</code></p>
+      <p>The <code>RagController</code> manages RAG indexes for Azure AI Search Services and Weaviate Cloud. This API allows you to create, configure, query, and manage RAG indexes and their documents.</p>
+      <div class="callout">
+        <strong>Weaviate Limitations:</strong>
+        <ul>
+          <li>When <code>RagHost</code> is set to <code>Weaviate</code>, <strong>ScoringProfile</strong>, <strong>ChunkOverlap</strong>, and <strong>IndexingInterval</strong> settings are ignored.</li>
+          <li>Weaviate indexes do <strong>not</strong> automatically refresh when new documents are added. Use the <code>/Rag/Index/{index}/Run</code> route whenever you need to update the documents.</li>
+          <li>Azure indexes update automatically on the schedule defined by <code>IndexingInterval</code>, but you can still trigger an immediate update with the <code>/Run</code> route.</li>
+        </ul>
+      </div>
+
+      <h4>1. Get RAG Index</h4>
+      <p><strong>HTTP Request:</strong> <span class="method get">GET</span> <code>/Rag/Index/{index}</code></p>
+      <p><strong>Description:</strong> Retrieves the metadata for a RAG index identified by its name.</p>
+      <p><strong>Route Parameters:</strong></p>
+      <ul>
+        <li><code>index</code> (string): The name of the RAG index.</li>
+      </ul>
+      <p><strong>Responses:</strong></p>
+      <ul>
+        <li><code>200 OK</code>: Returns the index metadata. Schema: <code>IndexMetadata</code></li>
+        <li><code>400 Bad Request</code>: If the index name is invalid.</li>
+        <li><code>404 Not Found</code>: If the index is not found.</li>
+        <li><code>500 Internal Server Error</code>: Unexpected server error.</li>
+      </ul>
+      <p><strong>Example Request:</strong></p>
+      <div class="code-block">
+        <button class="copy-btn">Copy</button>
+        <pre><code class="language-bash">GET https://yourapi.com/Rag/Index/MyRagIndex</code></pre>
+      </div>
+      <p><strong>Example Response:</strong></p>
+      <div class="code-block">
+        <button class="copy-btn">Copy</button>
+        <pre><code class="language-json">{
+    "Name": "MyRagIndex",
+    "GenerationHost": "AzureAI",
+    "IndexingInterval": "00:05:00",
+    "EmbeddingModel": "ada-text-embedding-002 | text-embedding-3-large",
+    "MaxRagAttachments": 10,
+    "ChunkOverlap": 0.2,
+    "ScoringProfile": {
+        "Name": "DefaultScoring",
+        "SearchAggregation": "Sum | Average | Minimum | Maximum | FirstMatching",
+        "SearchInterpolation": "Linear | Constant | Quadratic | Logarithmic",
+        "FreshnessBoost": 1.0,
+        "BoostDurationDays": 7,
+        "TagBoost": 1.5,
+        "Weights": {
+            "field1": 0.8,
+            "field2": 1.2
+        }
+    }
+}</code></pre>
+      </div>
+
+      <h4>2. Get All RAG Indexes</h4>
+      <p><strong>HTTP Request:</strong> <span class="method get">GET</span> <code>/Rag/Index/All</code></p>
+      <p><strong>Description:</strong> Retrieves a list of all RAG index metadata.</p>
+      <p><strong>Responses:</strong></p>
+      <ul>
+        <li><code>200 OK</code>: Returns a list of indexes. Schema: <code>IEnumerable<IndexMetadata></code></li>
+        <li><code>500 Internal Server Error</code>: Unexpected server error.</li>
+      </ul>
+      <p><strong>Example Request:</strong></p>
+      <div class="code-block">
+        <button class="copy-btn">Copy</button>
+        <pre><code class="language-bash">GET https://yourapi.com/Rag/Index/All</code></pre>
+      </div>
+      <p><strong>Example Response:</strong></p>
+      <div class="code-block">
+        <button class="copy-btn">Copy</button>
+        <pre><code class="language-json">[
+    {
+        "Name": "MyRagIndex",
+        "GenerationHost": "AzureAI",
+        "IndexingInterval": "00:05:00",
+        "EmbeddingModel": "ada-text-embedding-002 | text-embedding-3-large",
+        "MaxRagAttachments": 10,
+        "ChunkOverlap": 0.2,
+        "ScoringProfile": {
+            "Name": "DefaultScoring",
+            "SearchAggregation": "Sum | Average | Minimum | Maximum | FirstMatching",
+            "SearchInterpolation": "Linear | Constant | Quadratic | Logarithmic",
+            "FreshnessBoost": 1.0,
+            "BoostDurationDays": 7,
+            "TagBoost": 1.5,
+            "Weights": {
+                "field1": 0.8,
+                "field2": 1.2
+            }
+        }
+    },
+    {
+        "Name": "AnotherIndex",
+        "GenerationHost": "AzureAI",
+        "IndexingInterval": "00:05:00",
+        "EmbeddingModel": "ada-text-embedding-002 | text-embedding-3-large",
+        "MaxRagAttachments": 10,
+        "ChunkOverlap": 0.2,
+        "ScoringProfile": {
+            "Name": "SecondaryScoring",
+            "SearchAggregation": "Sum | Average | Minimum | Maximum | FirstMatching",
+            "SearchInterpolation": "Linear | Constant | Quadratic | Logarithmic",
+            "FreshnessBoost": 1.0,
+            "BoostDurationDays": 7,
+            "TagBoost": 1.5,
+            "Weights": {
+                "field1": 0.8,
+                "field2": 1.2
+            }
+        }
+    }
+]</code></pre>
+      </div>
+
+      <h4>3. Create RAG Index</h4>
+      <p><strong>HTTP Request:</strong> <span class="method post">POST</span> <code>/Rag/Index</code></p>
+      <p><strong>Description:</strong> Creates a new RAG index in Azure AI Search Services or Weaviate Cloud using the provided index definition.</p>
+      <p><strong>Request Body:</strong></p>
+      <div class="code-block">
+        <button class="copy-btn">Copy</button>
+        <pre><code class="language-json">{
+    "Name": "MyRagIndex",
+    "GenerationHost": "AzureAI",
+    "RagHost": "Azure",
+    "IndexingInterval": "00:05:00",
+    "EmbeddingModel": "ada-text-embedding-002",
+    "MaxRagAttachments": 10,
+    "ChunkOverlap": 0.2,
+    "ScoringProfile": {
+        "Name": "DefaultScoring",
+        "SearchAggregation": "Sum | Average | Minimum | Maximum | FirstMatching",
+        "SearchInterpolation": "Linear | Constant | Quadratic | Logarithmic",
+        "FreshnessBoost": 1.0,
+        "BoostDurationDays": 7,
+        "TagBoost": 1.5,
+        "Weights": {
+            "field1": 0.8,
+            "field2": 1.2
+        }
+    },
+    "GenerateKeywords": true,
+    "GenerateTopic": false
+}</code></pre>
+      </div>
+      <p><strong>Responses:</strong></p>
+      <ul>
+        <li><code>200 OK</code>: Returns the created index metadata.</li>
+        <li><code>400 Bad Request</code>: If validation fails or the request payload is malformed.</li>
+        <li><code>500 Internal Server Error</code>: Unexpected server error.</li>
+      </ul>
+      <p><strong>Example Response:</strong></p>
+      <div class="code-block">
+        <button class="copy-btn">Copy</button>
+        <pre><code class="language-json">{
+    "Name": "MyRagIndex",
+    "RagHost": "Azure",
+    "GenerationHost": "AzureAI",
+    "IndexingInterval": "00:05:00",
+    "EmbeddingModel": "ada-text-embedding-002",
+    "MaxRagAttachments": 10,
+    "ChunkOverlap": 0.2,
+    "ScoringProfile": {
+        "Name": "DefaultScoring",
+        "SearchAggregation": "Sum",
+        "SearchInterpolation": "Linear",
+        "FreshnessBoost": 1.0,
+        "BoostDurationDays": 7,
+        "TagBoost": 1.5,
+        "Weights": {
+            "field1": 0.8,
+            "field2": 1.2
+        }
+    },
+    "GenerateKeywords": true,
+    "GenerateTopic": false
+}</code></pre>
+      </div>
+
+      <h4>4. Configure RAG Index</h4>
+      <p><strong>HTTP Request:</strong> <span class="method post">POST</span> <code>/Rag/Index/Configure/{index}</code></p>
+      <p><strong>Description:</strong> Configures an existing RAG index with a new definition.</p>
+      <p><strong>Route Parameters:</strong></p>
+      <ul>
+        <li><code>index</code> (string): The name of the index to configure.</li>
+      </ul>
+      <p><strong>Request Body:</strong></p>
+      <div class="code-block">
+        <button class="copy-btn">Copy</button>
+        <pre><code class="language-json">{
+    "Name": "MyRagIndex",
+    "GenerationHost": "AzureAI",
+    "RagHost": "Azure",
+    "IndexingInterval": "00:05:00",
+    "EmbeddingModel": "text-embedding-3-large | ada-text-embedding-002",
+    "MaxRagAttachments": 10,
+    "ChunkOverlap": 0.2,
+    "ScoringProfile": {
+        "Name": "DefaultScoring",
+        "SearchAggregation": "Sum | Average | Minimum | Maximum | FirstMatching",
+        "SearchInterpolation": "Linear | Constant | Quadratic | Logarithmic",
+        "FreshnessBoost": 1.0,
+        "BoostDurationDays": 7,
+        "TagBoost": 1.5,
+        "Weights": {
+            "field1": 0.8,
+            "field2": 1.2
+        }
+    },
+    "GenerateKeywords": true,
+    "GenerateTopic": false
+}</code></pre>
+      </div>
+      <p><strong>Responses:</strong></p>
+      <ul>
+        <li><code>200 OK</code>: Returns the updated index metadata.</li>
+        <li><code>400 Bad Request</code>: If validation fails or the request payload is malformed.</li>
+        <li><code>404 Not Found</code>: If the index is not found.</li>
+        <li><code>500 Internal Server Error</code>: Unexpected server error.</li>
+      </ul>
+      <p><strong>Example Response:</strong></p>
+      <div class="code-block">
+        <button class="copy-btn">Copy</button>
+        <pre><code class="language-json">{
+    "Name": "MyRagIndex",
+    "RagHost": "Azure",
+    "GenerationHost": "AzureAI",
+    "IndexingInterval": "00:05:00",
+    "EmbeddingModel": "text-embedding-3-large",
+    "MaxRagAttachments": 10,
+    "ChunkOverlap": 0.2,
+    "ScoringProfile": {
+        "Name": "DefaultScoring",
+        "SearchAggregation": "Sum",
+        "SearchInterpolation": "Linear",
+        "FreshnessBoost": 1.0,
+        "BoostDurationDays": 7,
+        "TagBoost": 1.5,
+        "Weights": {
+            "field1": 0.8,
+            "field2": 1.2
+        }
+    },
+    "GenerateKeywords": true,
+    "GenerateTopic": false
+}</code></pre>
+      </div>
+
+      <h4>5. Query RAG Index</h4>
+      <p><strong>HTTP Request:</strong> <span class="method get">GET</span> <code>/Rag/Index/{index}/Query/{query}</code></p>
+      <p><strong>Description:</strong> Executes a query against the specified RAG index to retrieve matching documents.</p>
+      <p><strong>Route Parameters:</strong></p>
+      <ul>
+        <li><code>index</code> (string): The name of the RAG index.</li>
+        <li><code>query</code> (string): The search query.</li>
+      </ul>
+      <p><strong>Responses:</strong></p>
+      <ul>
+        <li><code>200 OK</code>: Returns a collection of documents that match the query.</li>
+        <li><code>400 Bad Request</code>: If the query is invalid.</li>
+        <li><code>404 Not Found</code>: If the index is not found.</li>
+        <li><code>500 Internal Server Error</code>: Unexpected server error.</li>
+      </ul>
+      <p><strong>Example Request:</strong></p>
+      <div class="code-block">
+        <button class="copy-btn">Copy</button>
+        <pre><code class="language-bash">GET https://yourapi.com/Rag/Index/MyRagIndex/Query/azure</code></pre>
+      </div>
+      <p><strong>Example Response:</strong></p>
+      <div class="code-block">
+        <button class="copy-btn">Copy</button>
+        <pre><code class="language-json">[
+    {
+        "Title": "Azure AI Services",
+        "Content": "Details about Azure AI Search Services..."
+    },
+    {
+        "Title": "Getting Started with Azure AI",
+        "Content": "An introductory guide..."
+    }
+]</code></pre>
+      </div>
+
+      <h4>6. Run RAG Index Update</h4>
+      <p><strong>HTTP Request:</strong> <span class="method post">POST</span> <code>/Rag/Index/{index}/Run</code></p>
+      <p><strong>Description:</strong> Initiates an update run for the specified RAG index to refresh its data.</p>
+      <p><strong>Route Parameters:</strong></p>
+      <ul>
+        <li><code>index</code> (string): The name of the RAG index.</li>
+      </ul>
+      <p><strong>Responses:</strong></p>
+      <ul>
+        <li><code>204 No Content</code>: Index update run initiated successfully.</li>
+        <li><code>400 Bad Request</code>: If the index name is invalid.</li>
+        <li><code>404 Not Found</code>: If the index is not found.</li>
+        <li><code>500 Internal Server Error</code>: Unexpected server error.</li>
+      </ul>
+      <p><strong>Example Request:</strong></p>
+      <div class="code-block">
+        <button class="copy-btn">Copy</button>
+        <pre><code class="language-bash">curl -X POST "https://yourapi.com/Rag/Index/MyRagIndex/Run"</code></pre>
+      </div>
+
+      <h4>7. Delete RAG Index</h4>
+      <p><strong>HTTP Request:</strong> <span class="method delete">DELETE</span> <code>/Rag/Index/Delete/{index}</code></p>
+      <p><strong>Description:</strong> Deletes the specified RAG index.</p>
+      <p><strong>Route Parameters:</strong></p>
+      <ul>
+        <li><code>index</code> (string): The name of the RAG index to delete.</li>
+      </ul>
+      <p><strong>Responses:</strong></p>
+      <ul>
+        <li><code>204 No Content</code>: Index deleted successfully.</li>
+        <li><code>400 Bad Request</code>: If the index name is invalid.</li>
+        <li><code>404 Not Found</code>: If the index is not found.</li>
+        <li><code>500 Internal Server Error</code>: Unexpected server error.</li>
+      </ul>
+      <p><strong>Example Request:</strong></p>
+      <div class="code-block">
+        <button class="copy-btn">Copy</button>
+        <pre><code class="language-bash">curl -X DELETE "https://yourapi.com/Rag/Index/Delete/MyRagIndex"</code></pre>
+      </div>
+
+      <h4>8. Get All Documents in a RAG Index</h4>
+      <p><strong>HTTP Request:</strong> <span class="method get">GET</span> <code>/Rag/Index/{index}/Document/{count}/Page/{page}</code></p>
+      <p><strong>Description:</strong> Retrieves a paginated list of documents from the specified RAG index.</p>
+      <p><strong>Route Parameters:</strong></p>
+      <ul>
+        <li><code>index</code> (string): The name of the RAG index.</li>
+        <li><code>count</code> (integer): Number of documents to retrieve in the current batch.</li>
+        <li><code>page</code> (integer): Page offset (must be 1 or greater).</li>
+      </ul>
+      <p><strong>Responses:</strong></p>
+      <ul>
+        <li><code>200 OK</code>: Returns a collection of documents. Schema: <code>IEnumerable<IndexDocument></code></li>
+        <li><code>400 Bad Request</code>: If pagination parameters or index name are invalid.</li>
+        <li><code>500 Internal Server Error</code>: Unexpected server error.</li>
+      </ul>
+      <p><strong>Example Request:</strong></p>
+      <div class="code-block">
+        <button class="copy-btn">Copy</button>
+        <pre><code class="language-bash">GET https://yourapi.com/Rag/Index/MyRagIndex/Document/10/Page/1</code></pre>
+      </div>
+      <p><strong>Example Response:</strong></p>
+      <div class="code-block">
+        <button class="copy-btn">Copy</button>
+        <pre><code class="language-json">[
+    {
+        "Title": "Azure AI Services",
+        "Content": "Details about Azure AI Search Services..."
+    },
+    {
+        "Title": "Getting Started with Azure AI",
+        "Content": "An introductory guide..."
+    }
+</code></pre>
+<!-- Continuing from the last RAG Index endpoint -->
+
+      <h4>9. Get Document from RAG Index</h4>
+      <p><strong>HTTP Request:</strong> <span class="method get">GET</span> <code>/Rag/Index/{index}/document/{document}</code></p>
+      <p><strong>Description:</strong> Retrieves a specific document from a RAG index by its title.</p>
+      <p><strong>Route Parameters:</strong></p>
+      <ul>
+        <li><code>index</code> (string): The name of the RAG index.</li>
+        <li><code>document</code> (string): The title of the document.</li>
+      </ul>
+      <p><strong>Responses:</strong></p>
+      <ul>
+        <li><code>200 OK</code>: Returns the requested document. Schema: <code>IndexDocument</code></li>
+        <li><code>400 Bad Request</code>: If parameters are invalid.</li>
+        <li><code>404 Not Found</code>: If the document is not found.</li>
+        <li><code>500 Internal Server Error</code>: Unexpected server error.</li>
+      </ul>
+      <p><strong>Example Request:</strong></p>
+      <div class="code-block">
+        <button class="copy-btn">Copy</button>
+        <pre><code class="language-bash">GET https://yourapi.com/Rag/Index/MyRagIndex/document/AzureAIOverview</code></pre>
+      </div>
+      <p><strong>Example Response:</strong></p>
+      <div class="code-block">
+        <button class="copy-btn">Copy</button>
+        <pre><code class="language-json">{
+    "Title": "AzureAIOverview",
+    "Content": "Comprehensive overview of Azure AI Search Services..."
+}</code></pre>
+      </div>
+
+      <h4>10. Upsert Documents to RAG Index</h4>
+      <p><strong>HTTP Request:</strong> <span class="method post">POST</span> <code>/Rag/index/{index}/Document</code></p>
+      <p><strong>Description:</strong> Upserts (adds or updates) documents in the specified RAG index. The request payload is validated to ensure that each document has a non-empty title and content, with limits on content size and field lengths.</p>
+      <p><strong>Route Parameters:</strong></p>
+      <ul>
+        <li><code>index</code> (string): The name of the RAG index.</li>
+      </ul>
+      <p><strong>Request Body:</strong></p>
+      <div class="code-block">
+        <button class="copy-btn">Copy</button>
+        <pre><code class="language-json">{
+    "Documents": [
+        {
+            "Title": "Azure AI Overview",
+            "Content": "Details about Azure AI Search Services...",
+            "Topic": "Azure",
+            "Keywords": "AI, Search, Azure",
+            "Source": "Official Documentation"
+        },
+        {
+            "Title": "Getting Started with Azure AI",
+            "Content": "An introductory guide...",
+            "Topic": "Tutorial",
+            "Keywords": "Azure, AI, Beginner",
+            "Source": "Microsoft Learn"
+        }
+    ]
+}</code></pre>
+      </div>
+      <p><strong>Responses:</strong></p>
+      <ul>
+        <li><code>200 OK</code>: Returns the upserted documents.</li>
+        <li><code>400 Bad Request</code>: If validation fails or the request payload is malformed.</li>
+        <li><code>404 Not Found</code>: If the index is not found.</li>
+        <li><code>500 Internal Server Error</code>: Unexpected server error.</li>
+      </ul>
+      <p><strong>Example Response:</strong></p>
+      <div class="code-block">
+        <button class="copy-btn">Copy</button>
+        <pre><code class="language-json">true</code></pre>
+      </div>
+
+      <h4>11. Delete Documents from RAG Index</h4>
+      <p><strong>HTTP Request:</strong> <span class="method delete">DELETE</span> <code>/Rag/index/{index}/Document/{commaDelimitedDocNames}</code></p>
+      <p><strong>Description:</strong> Deletes documents from a RAG index. The <code>commaDelimitedDocNames</code> parameter should contain the titles of the documents to be deleted, separated by commas.</p>
+      <p><strong>Route Parameters:</strong></p>
+      <ul>
+        <li><code>index</code> (string): The name of the RAG index.</li>
+        <li><code>commaDelimitedDocNames</code> (string): A comma-delimited string of document titles.</li>
+      </ul>
+      <p><strong>Responses:</strong></p>
+      <ul>
+        <li><code>200 OK</code>: Returns the number of documents deleted.</li>
+        <li><code>400 Bad Request</code>: If parameters are invalid.</li>
+        <li><code>404 Not Found</code>: If one or more documents are not found.</li>
+        <li><code>500 Internal Server Error</code>: Unexpected server error.</li>
+      </ul>
+      <p><strong>Example Request:</strong></p>
+      <div class="code-block">
+        <button class="copy-btn">Copy</button>
+        <pre><code class="language-bash">DELETE https://yourapi.com/Rag/index/MyRagIndex/Document/Doc1,Doc2</code></pre>
+      </div>
+      <p><strong>Example Response:</strong></p>
+      <div class="code-block">
+        <button class="copy-btn">Copy</button>
+        <pre><code class="language-json">2</code></pre>
+      </div>
+    </section>
+    <section id="contact">
+      <h2>Contact</h2>
+      <p>For any questions, comments, or concerns, please reach out to <a href="mailto:Applied.AI.Help@gmail.com">Applied.AI.Help@gmail.com</a>, or open an issue in the repository.</p>
+    </section>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js"></script>
+  <script>
+    function toggleMenu() {
+      const sidebar = document.getElementById('sidebar');
+      sidebar.classList.toggle('open');
+    }
+    document.querySelectorAll('.copy-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const code = btn.nextElementSibling.querySelector('code').textContent;
+        navigator.clipboard.writeText(code).then(() => {
+          btn.textContent = 'Copied!';
+          setTimeout(() => btn.textContent = 'Copy', 2000);
+        });
+      });
+    });
+  </script>
+</body>
+</html>
