@@ -1,4 +1,4 @@
-# The Intelligence Hub
+# The Intelligence Hub Documentation
 ### A robust wrapper for popular AI services, designed to streamline AI-powered app development while ensuring reliability and effortless cross-service configuration.
 ---
 ## Table of Contents
