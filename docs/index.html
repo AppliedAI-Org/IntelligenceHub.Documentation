@@ -2082,6 +2082,15 @@ await hubConnection.InvokeAsync("Send", request);</code></pre>
       const sidebar = document.getElementById('sidebar');
       sidebar.classList.toggle('open');
     }
+    // Close the sidebar when a menu link is clicked on small screens
+    document.querySelectorAll('#sidebar a').forEach(link => {
+      link.addEventListener('click', () => {
+        if (window.innerWidth <= 768) {
+          const sidebar = document.getElementById('sidebar');
+          sidebar.classList.remove('open');
+        }
+      });
+    });
     document.querySelectorAll('.copy-btn').forEach(btn => {
       btn.addEventListener('click', () => {
         const code = btn.nextElementSibling.querySelector('code').textContent;
