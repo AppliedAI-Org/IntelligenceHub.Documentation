@@ -60,8 +60,11 @@
     nav ul li a:hover {
       color: var(--link-color);
     }
+    .menu-toggle {
+      display: none;
+    }
     main {
-      margin-left: var(--sidebar-width);
+      margin-left: calc(var(--sidebar-width) + 2rem);
       padding: 2rem;
       padding-top: calc(var(--header-height) + 2rem);
     }
@@ -141,6 +144,7 @@
       }
       nav.open {
         transform: translateX(0);
+        z-index: 1;
       }
       main {
         margin-left: 0;
