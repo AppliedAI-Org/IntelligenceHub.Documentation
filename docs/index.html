@@ -15,6 +15,7 @@
       --border-color: #e0e0e0;
       --sidebar-width: 280px;
       --header-height: 60px;
+      --banner-height: 44px;
     }
     html, body {
       margin: 0;
@@ -140,6 +141,59 @@
     th {
       background-color: var(--bg-alt-color);
     }
+
+    /* Top banner */
+.top-banner {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: var(--banner-height);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0 3rem;
+  background: #111;
+  color: #fff;
+  font-weight: 600;
+  z-index: 1100; /* above header */
+  text-align: center;
+}
+.top-banner a {
+  color: #ffd666;
+  text-decoration: underline;
+}
+.top-banner .banner-close {
+  position: absolute;
+  right: 12px;
+  top: 8px;
+  background: transparent;
+  border: none;
+  color: #fff;
+  font-size: 1.25rem;
+  cursor: pointer;
+}
+
+/* Layout offsets ONLY when the banner is visible */
+body.has-banner header { top: var(--banner-height); }
+body.has-banner nav {
+  top: calc(var(--header-height) + var(--banner-height));
+  height: calc(100vh - var(--header-height) - var(--banner-height));
+}
+body.has-banner main {
+  padding-top: calc(var(--header-height) + 2rem + var(--banner-height));
+}
+body.has-banner section {
+  scroll-margin-top: calc(var(--header-height) + var(--banner-height) + 3rem);
+}
+
+/* Keep the hamburger from sitting under the banner on small screens */
+@media (max-width: 768px) {
+  body.has-banner .menu-toggle {
+    top: calc(10px + var(--banner-height));
+  }
+}
+
     @media (max-width: 768px) {
       nav {
         width: 100%;
@@ -166,9 +220,47 @@
         cursor: pointer;
       }
     }
+
+#contact .contact-buttons {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+  margin-top: 1rem;
+}
+
+#contact .secondary-btn {
+  display: inline-block;
+  padding: 0.6rem 1rem;
+  background-color: var(--bg-alt-color);
+  color: var(--link-color);
+  border: 1px solid var(--border-color);
+  border-radius: 6px;
+  text-decoration: none;
+  font-weight: bold;
+  text-align: center;
+  transition: background-color 0.2s ease, color 0.2s ease, box-shadow 0.2s ease;
+  min-width: 180px;
+}
+
+#contact .secondary-btn:hover {
+  background-color: var(--link-color);
+  color: #fff;
+  box-shadow: 0 3px 8px rgba(0, 0, 0, 0.1);
+}
+
+/* Optional: stack nicely on small screens */
+@media (max-width: 600px) {
+  #contact .secondary-btn {
+    width: 100%;
+  }
+}
   </style>
 </head>
 <body>
+  <div id="top-banner" class="top-banner" role="status" aria-live="polite">
+    <p>Note: This service is <strong>FREE</strong> for all tiers, excluding enterprises, until October 1st</p>
+    <button class="banner-close" aria-label="Dismiss notice" onclick="dismissBanner()">×</button>
+  </div>
   <header>
     <button class="menu-toggle" onclick="toggleMenu()">☰</button>
     <h1>The Intelligence Hub Documentation</h1>
@@ -178,17 +270,11 @@
     <ul>
       <li><a href="#overview">Overview</a></li>
       <li><a href="#features">Features</a></li>
-      <li><a href="#setup">Setup</a></li>
       <li><a href="#authentication">Authentication</a></li>
-      <li><a href="#feature-flags">Feature Flags</a></li>
-      <li><a href="#tenant-isolation">Tenant Isolation</a></li>
       <li><a href="#rate-limiting">Rate Limiting</a></li>
       <li><a href="#usage">Usage</a></li>
       <li><a href="#api-reference">API Reference</a></li>
-      <li><a href="#contributing">Contributing</a></li>
       <li><a href="#contact">Contact</a></li>
-      <li><a href="#license">License</a></li>
-      <li><a href="#acknowledgements">Acknowledgements</a></li>
     </ul>
   </nav>
   <main>
@@ -215,404 +301,297 @@
         <li>Conversation persistence</li>
       </ul>
       <p>AI clients are resolved using a custom client factory, allowing new clients to be added easily by implementing the <code>IAGIClient</code> interface. This design also supports image generation from various clients, decoupling the image generation providers from LLM providers within the same agent profile. A similar design could also be used to provide support for multiple RAG services with relative ease.</p>
-      <p>For more information, please refer to the <a href="#features">Features</a> section below.</p>
     </section>
-
+    <div class="callout">
+      <p><strong>NOTE:</strong> This documentation specifies usage for the paid for managed service deployment of the Intelligence Hub. For details about the open source branch, please visit: <a href="https://github.com/AppliedAI-Org/IntelligenceHub">https://github.com/AppliedAI-Org/IntelligenceHub</a></p>
+    </div>
     <section id="features">
       <h2>Features</h2>
       <ol>
         <li><strong>Saving agentic chat 'profiles'</strong> to simplify client requests, and create preset configurations related to prompting and AI model configs.</li>
         <li><strong>Chat completions</strong> including streaming via a SignalR web socket or via server side events, and support for custom models deployed in Azure AI Studio.</li>
-        <li><strong>RAG database support</strong>, including database creation, document ingestion, and the ability to perform RAG operations across AGI service providers. Support now includes Azure AI Search and Weaviate.</li>
+        <li><strong>RAG database support</strong>, including database creation, document ingestion, and the ability to perform RAG operations across AGI service providers.</li>
         <li><strong>Multimodality and image generation</strong> including the ability to mix and match image generation models across AGI service providers.</li>
         <li><strong>Tool execution</strong> via returning the tool arguments to the client, or executing them against an external API, and returning the resulting HTTP response data.</li>
         <li><strong>Conversation history</strong> saving and loading from the database.</li>
         <li><strong>Support for multiple AGI providers</strong>, which currently includes Azure AI, OpenAI, and Anthropic.</li>
-        <li><strong>Chat recursion</strong> allowing LLM models to continue dialogues between themselves and other agent profiles, pass off complex processes to more specialized profiles, and generate additional content that would otherwise surpass the output window.</li>
-        <li><strong>Resilient design</strong> including automatic load balancing, and retry policies.</li>
-        <li><strong>Automatic logging</strong> via Application Insights.</li>
-        <li><strong>Front-end template</strong> to jump start the process of building custom applications to consume the API.</li>
-        <li><strong>Testing utilities</strong> including unit tests, stress tests, and an AI competency testing module.</li>
-      </ol>
-    </section>
-
-    <section id="setup">
-      <h2>Setup</h2>
-      <h3>Setup Instructions</h3>
-      <p>This section outlines the steps required to set up the IntelligenceHub repository for local development. IntelligenceHub is a .NET API wrapper for AI services that relies on several external resources including AI service providers, search functionalities, and additional infrastructure.</p>
-      <p>Optional infrastructure can be treated modularly unless otherwise noted, but you should be able to find a free tier available for every piece of infrastructure as well, excluding the LLM hosts, although the Azure OpenAI option is at least a 'pay as you go' model, keeping things exceptionally cheap. A cloud account is needed if you plan to use Azure AI Search or Weaviate Cloud for RAG operations, or if you wish to use Azure OpenAI as your LLM host.</p>
-      <div class="callout">
-        <strong>NOTE:</strong> The application requires several sensitive keys and values to populate the configuration. If you intend to use an associated feature, please be sure to have the relevant keys and endpoint data ready when running the <code>env_setup.py</code> script at <code>IntelligenceHub/IntelligenceHub/infrastructure/env_setup.py</code>. The only required features are an SQL Server connection string, and the API key for at least one LLM host.
-      </div>
-
-      <h4>1. Environment Setup</h4>
-      <ul>
-        <li><strong>Ensure the following are installed</strong>:
-          <ul>
-            <li><a href="https://dotnet.microsoft.com/download">.NET SDK (version 8.0 or later)</a></li>
-            <li><a href="https://www.python.org/downloads/">Python 3.1 or later</a> – for running the appsettings generation script.</li>
-            <li><a href="https://visualstudio.microsoft.com/">Visual Studio 2022</a> is recommended for easiest set up, but technically the Git client should suffice.</li>
-          </ul>
-        </li>
-        <li><strong>Set Up the Repo</strong>:
-          <ol>
-            <li>Open Visual Studio, and select 'clone a repository.'</li>
-            <li>Get the Git repository URL at <a href="https://github.com/Jacob-J-Thomas/IntelligenceHub">https://github.com/Jacob-J-Thomas/IntelligenceHub</a>, and use it to clone the repo.</li>
-          </ol>
-        </li>
-      </ul>
-
-      <h4>2. Create Resource Dependencies</h4>
-      <p><strong>Note:</strong> The repository includes a Python script, <code>IntelligenceHub/infrastructure/env_setup.py</code>, that generates a development configuration file by populating <code>appsettings.Development.json</code> from a template. You may find it worthwhile to save the API keys and URLs associated with these resources so that you can easily enter them into the Python script later.</p>
-      <h5>Essential Resources for Basic Completions</h5>
-      <p>The below resources are the bare minimum requirements to run the API and get a <code>200</code> response from the <code>/Completion/Chat/{profileName}</code> endpoint. If your application requires RAG database operations or app insight telemetry collection, please ensure you follow the associated steps in the optional "Additional Cloud Resources" section.</p>
-      <ul>
-        <li><strong>SQL Database (required)</strong> – The application relies on SQL to store conversation history, completion profiles, and RAG metadata. You can use a local SQL Server instance following the <a href="https://docs.microsoft.com/en-us/sql/database-engine/install-windows/install-sql-server?view=sql-server-ver15">SQL Server Installation Guide</a> (free versions are <a href="https://www.microsoft.com/en-us/sql-server/sql-server-downloads">available here</a>). Run the scripts in <code>/IntelligenceHub/IntelligenceHub.DAL/Scripts</code> after creating the database. If you plan to use Azure AI Search, your SQL database must be reachable from Azure (for example, by deploying an <a href="https://learn.microsoft.com/en-us/azure/azure-sql/database/single-database-create-quickstart?view=azuresql&tabs=azure-portal#prerequisites">Azure SQL Database</a> or exposing your local server).</li>
-        <li>An API key from one of the supported LLM providers (e.g., OpenAI, Azure OpenAI, or Anthropic). NOTE: Technically only one of the below is required, provided you only use that host.
-          <ul>
-            <li><strong>OpenAI</strong>: Retrieve your API key from <a href="https://help.openai.com/en/articles/4936850-where-do-i-find-my-openai-api-key">OpenAI's platform</a>.</li>
-            <li><strong>Anthropic</strong>: Sign in and create a <a href="https://console.anthropic.com/settings/keys">new API key here</a>. Make sure to save its details.</li>
-            <li><strong>Azure OpenAI</strong>: Create an Azure OpenAI resource, and be sure to deploy at least one LLM in your Azure OpenAI deployment. You can name this model deployment whatever you want, but be sure to add this name to the <code>ValidAGIModels</code> array when running the <code>env_setup.py</code> script. Instructions on deploying this resource can be <a href="https://learn.microsoft.com/en-us/azure/ai-services/openai/how-to/create-resource?pivots=web-portal">found here</a>.</li>
-          </ul>
-        </li>
-      </ul>
-      <h5>Additional Cloud Resources (Optional)</h5>
-      <p>You only need to set up these additional resources if you plan to use advanced features such as RAG operations. For basic completions, local configuration with a single LLM provider's API key is sufficient.</p>
-      <ul>
-        <li><strong>Azure SQL Database</strong> – Required when using Azure AI Search for RAG operations. Follow the <a href="https://learn.microsoft.com/en-us/azure/azure-sql/database/single-database-create-quickstart?view=azuresql&tabs=azure-portal#prerequisites">Azure SQL database quickstart guide</a> if you need to deploy one in Azure.</li>
-        <li><strong>Azure AI Search Services</strong> – Required for RAG operations that use Azure Search. Follow <a href="https://learn.microsoft.com/en-us/azure/search/search-create-service-portal">Azure's setup guide</a> to create a service. (NOTE: Azure AI Search requires your SQL server to either be in Azure, or to be accessible from the public internet)</li>
-        <li><strong>Weaviate Cloud</strong> – Alternatively, you can host indexes in Weaviate's managed cloud. See <a href="https://weaviate.io/developers/weaviate/installation/weaviate-cloud">Weaviate's documentation</a> for instructions. (Is compatible with any SQL database, no public internet access required)</li>
-        <li><strong>Application Insights</strong> – Only required for telemetry and performance monitoring. For setup, follow <a href="https://learn.microsoft.com/en-us/azure/azure-monitor/app/asp-net-core">these instructions for setting up Application Insights for .NET Core</a>. The application is already set up to use the service, so skip any sections that aren't related to getting a connection string.</li>
-      </ul>
-
-      <h4>3. Configure Application Settings</h4>
-      <ol>
-        <li><strong>Locate the Template and Output Paths</strong>:
-          <ul>
-            <li><strong>Template</strong>: <code>IntelligenceHub.Host/appsettings.Template.json</code></li>
-            <li><strong>Output</strong>: <code>IntelligenceHub.Host/appsettings.Development.json</code></li>
-          </ul>
-        </li>
-        <li><strong>Collect Any Required Secrets and Keys</strong>
-          <ul>
-            <li>Only the SQL database string, and one LLM host credential/url combination is required.</li>
-            <li>Refer to the <code>appsettings.Template.json</code> file for a list of all possible values.</li>
-          </ul>
-        </li>
-        <li><strong>Run the Script</strong>:
-          <ul>
-            <li>Open a terminal in the repository’s base directory.</li>
-            <li>Execute the script (e.g., open the command line, navigate to the file, and run: <code>python env_setup.py</code>).</li>
-            <li><strong>Script Details</strong>:
-              <ul>
-                <li>The script is configured to work in a CI/CD pipeline, but this setup is outside of the scope of this guide.</li>
-                <li>The script searches for environment variables before requesting they be populated by the user.</li>
-                <li>Supports multiple entries for service endpoints (e.g., Azure OpenAI Services, OpenAI Services, Anthropic Services).</li>
-                <li>Set environment variables to pre-populate the template. New variables such as <code>FeatureFlagSettings_UseAzureAISearch</code> enable optional features.</li>
-                <li>If using Azure OpenAI, be sure to populate <code>ValidAGIModels</code> with the names of your deployed models, otherwise leave empty.</li>
-                <li>Be sure to list any intended clients under <code>ValidOrigins</code>, which will be used to populate the CORS policy's allowed origins. Can be set to <code>*</code> for a permissive policy to get a dev environment up and running quickly.</li>
-                <li>For the <code>SearchServiceCompletionService</code> values, provide any set of credentials you used for one of the completion services, or if you don't intend to use RAG operations, feel free to leave it null. These values are used to generate the Keywords and Topic strings for RAG documents if <code>GenerateKeywords</code> or <code>GenerateTopic</code> is set to true on the targeted index.</li>
-              </ul>
-            </li>
-            <li>Upon completion, the script writes the updated configuration to <code>appsettings.Development.json</code>.</li>
-          </ul>
-        </li>
-      </ol>
-
-      <h4>4. Run the Application</h4>
-      <ol>
-        <li><strong>Open the solution folder if the repo did not already</strong></li>
-        <li><strong>Run the application</strong>
-          <ul>
-            <li>If using Visual Studio, click the drop down arrow next to 'run' button, and select 'Configure Startup Projects' from the list. Ensure that <code>IntelligenceHub.Host.csproj</code> is selected as the startup application, and then run the application.</li>
-            <li>Otherwise, start the application using 'Dotnet Run' or your preferred IDE.</li>
-          </ul>
-        </li>
-        <li><strong>Begin Making Requests Using the Swagger Page</strong>
-          <ul>
-            <li>Refer to the <a href="#usage">next section on usage</a> for help making your first request.</li>
-          </ul>
-        </li>
+        <li><strong>Chat recursion</strong>Mimics 'LLM Thinking,' supported by many APIs. Allows LLM models to continue dialogues between themselves and other agent profiles, pass off complex processes to more specialized profiles, and generate additional content that would otherwise surpass the output window.</li>
+        <li><strong>Resilient design</strong> including automatic load balancing, and retry policies built-in.</li>
       </ol>
     </section>
 
     <section id="authentication">
       <h2>Authentication</h2>
-      <p>The API uses JWT bearer authentication. Obtain a token using your API key with one of the following endpoints:</p>
+      <p>
+        The Intelligence Hub uses <strong>API key authentication</strong>. Include your key on every request using the
+        <code>X-Api-Key</code> header — no OAuth/JWT exchange and no <code>/auth/*</code> endpoints.
+      </p>
       <ol>
-        <li><code>GET /auth/defaulttoken</code> – returns a standard token for typical API access.</li>
-        <li><code>GET /auth/admintoken</code> – returns an elevated token for administrative actions.</li>
+        <li>
+          Generate your key from the
+          <a href="https://theintelligencehub.azurewebsites.net/reference" target="_blank" rel="noopener noreferrer">
+            API Reference
+          </a>
+          tab. Be sure to save the key somewhere safe, as you will not be able to access it again after leaving the tab.
+        </li>
+        <li>Send requests with <code>X-Api-Key: &lt;your_api_key&gt;</code>.</li>
       </ol>
-      <p>Send your API key in the <code>X-Api-Key</code> header. The response payload is an <code>Auth0Response</code> containing the <code>access_token</code>. Include this token in subsequent requests using the <code>Authorization: Bearer {token}</code> header.</p>
-    </section>
-
-    <section id="feature-flags">
-      <h2>Feature Flags</h2>
-      <p>Optional functionality can be toggled through feature flags stored in <code>FeatureFlagSettings</code>.</p>
-      <ul>
-        <li><strong>UseAzureAISearch</strong> – controls whether Azure AI Search endpoints are available. Set the <code>FeatureFlagSettings_UseAzureAISearch</code> environment variable (or update <code>appsettings.Development.json</code>) to <code>true</code> to enable these features.</li>
-      </ul>
-    </section>
-
-    <section id="tenant-isolation">
-      <h2>Tenant Isolation</h2>
-      <p>Each user record includes a <code>TenantId</code>. When creating RAG indexes, the service prefixes the index name with the tenant ID to ensure resources from different tenants remain isolated. Index names returned by the API have the tenant prefix removed for convenience.</p>
+    
+      <div class="code-block">
+        <pre><code>// Example (C# HttpClient)
+    using var client = new HttpClient();
+    client.DefaultRequestHeaders.Add("X-Api-Key", "&lt;your_api_key&gt;");
+    // ...then call your endpoints
+    </code></pre>
+      </div>
+      <div class="callout">
+        <p>
+          <strong>Note:</strong> Outside the enterprise tier, tenants are not yet supported; resources are currently scoped to a single account, but we have plans to change this soon.
+        </p>
+      </div>
     </section>
 
     <section id="rate-limiting">
       <h2>Rate Limiting</h2>
-      <p>Requests are subject to per-user rate limits. Free users may send up to <strong>10 requests per minute</strong> and no more than <strong>100 requests per month</strong>. Paid users are allowed <strong>60 requests per minute</strong> without a monthly cap. Exceeding these limits results in a <code>429 Too Many Requests</code> response.</p>
+      <p>Requests are subject to per-user rate limits enforced over a <strong>rolling 60-second window</strong>. Free users may send up to <strong>10 requests per 60 seconds</strong> and may be limited to <strong>100 requests per month</strong> (free-tier policy limit). Paid users are allowed <strong>60 requests per 60 seconds</strong> with no monthly cap. Exceeding these limits results in a <code>429 Too Many Requests</code> response.</p>
     </section>
 
     <section id="usage">
       <h2>Usage</h2>
       <p>The heart of this API is the concept of an agentic <code>profile</code>, which can be thought of as a preset of request parameters and prompting data that can be used to return LLM chat completions, and other responses. Using profiles, you can easily handle saving system prompts, tool definitions, and model settings, allowing clients to receive AI content with nothing more than the name of the profile, and a single user message.</p>
       <p>Follow these steps to create a profile and then make a chat request using that profile.</p>
-
+    
+      <div class="callout">
+        <strong>Auth:</strong> Include your API key on every request using <code>X-Api-Key: &lt;your_api_key&gt;</code>.
+      </div>
+    
       <h4>1. Create or Update a Profile</h4>
       <p>Use the upsert endpoint to create (or update) an agent profile. In this example, we create a profile named <strong>ChatProfile</strong>. Only a Name, Host, and Model are required to create a profile. The rest of the details can be defaulted.</p>
-      <p><strong>HTTP Request:</strong> <span class="method post">POST</span> <code>https://yourapi.com/Profile/upsert</code></p>
+      <p><strong>HTTP Request:</strong> <span class="method post">POST</span> <code>https://intelligencehub-managed.azurewebsites.net/Profile/upsert</code></p>
       <div class="code-block">
         <button class="copy-btn">Copy</button>
         <pre><code class="language-json">{
-    "Name": "ChatProfile",
-    "Model": "gpt-4o",
-    "Host": "OpenAI",
-    "Temperature": 0.7,
-    "MaxTokens": 150
-}</code></pre>
+      "Name": "ChatProfile",
+      "Model": "gpt-4o",
+      "Host": "OpenAI",
+      "Temperature": 0.7,
+      "MaxTokens": 150
+    }</code></pre>
       </div>
       <div class="code-block">
         <button class="copy-btn">Copy</button>
-        <pre><code class="language-bash">curl -X POST "https://yourapi.com/Profile/upsert" \
-     -H "Content-Type: application/json" \
-     -d '{
-           "Name": "ChatProfile",
-           "Model": "gpt-4o",
-           "Host": "OpenAI",
-           "Temperature": 0.7,
-           "MaxTokens": 150
-         }'</code></pre>
+        <pre><code class="language-bash">curl -X POST "https://intelligencehub-managed.azurewebsites.net/Profile/upsert" \
+      -H "X-Api-Key: &lt;your_api_key&gt;" \
+      -H "Content-Type: application/json" \
+      -d '{
+            "Name": "ChatProfile",
+            "Model": "gpt-4o",
+            "Host": "OpenAI",
+            "Temperature": 0.7,
+            "MaxTokens": 150
+          }'</code></pre>
       </div>
       <p>If successful, the API will create or update the <strong>ChatProfile</strong> with the provided configuration.</p>
-
+    
       <h4>2. Make a Chat Request</h4>
       <p>With the profile created, you can now send a chat request using the Chat Completion API.</p>
-      <p><strong>HTTP Request:</strong> <span class="method post">POST</span> <code>https://yourapi.com/Completion/Chat/ChatProfile</code></p>
+      <p><strong>HTTP Request:</strong> <span class="method post">POST</span> <code>https://intelligencehub-managed.azurewebsites.net/Completion/Chat/ChatProfile</code></p>
       <div class="code-block">
         <button class="copy-btn">Copy</button>
         <pre><code class="language-json">{
-    "ConversationId": "d290f1ee-6c54-4b01-90e6-d701748f0851",
-    "ProfileOptions": {
+      "ConversationId": "d290f1ee-6c54-4b01-90e6-d701748f0851",
+      "ProfileOptions": {
         "Name": "ChatProfile",
         "Model": "gpt-4o",
         "Host": "OpenAI",
         "Temperature": 0.7,
         "MaxTokens": 150
-    },
-    "Messages": [
+      },
+      "Messages": [
         {
-            "Role": "User",
-            "Content": "Hello, how are you?"
+          "Role": "User",
+          "Content": "Hello, how are you?"
         }
-    ]
-}</code></pre>
+      ]
+    }</code></pre>
       </div>
       <div class="code-block">
         <button class="copy-btn">Copy</button>
-        <pre><code class="language-bash">curl -X POST "https://yourapi.com/Completion/Chat/ChatProfile" \
-     -H "Authorization: Bearer {token}" \
-     -H "Content-Type: application/json" \
-     -d '{
-           "ConversationId": "d290f1ee-6c54-4b01-90e6-d701748f0851",
-           "ProfileOptions": {
-               "Name": "ChatProfile",
-               "Model": "gpt-4o",
-               "Host": "OpenAI",
-               "Temperature": 0.7,
-               "MaxTokens": 150
-           },
-           "Messages": [
-               {
-                   "Role": "User",
-                   "Content": "Hello, how are you?"
-               }
-           ]
-         }'</code></pre>
+        <pre><code class="language-bash">curl -X POST "https://intelligencehub-managed.azurewebsites.net/Completion/Chat/ChatProfile" \
+      -H "X-Api-Key: &lt;your_api_key&gt;" \
+      -H "Content-Type: application/json" \
+      -d '{
+            "ConversationId": "d290f1ee-6c54-4b01-90e6-d701748f0851",
+            "ProfileOptions": {
+              "Name": "ChatProfile",
+              "Model": "gpt-4o",
+              "Host": "OpenAI",
+              "Temperature": 0.7,
+              "MaxTokens": 150
+            },
+            "Messages": [
+              {
+                "Role": "User",
+                "Content": "Hello, how are you?"
+              }
+            ]
+          }'</code></pre>
       </div>
       <p><strong>Expected Response:</strong></p>
       <div class="code-block">
         <button class="copy-btn">Copy</button>
         <pre><code class="language-json">{
-    "Messages": [
+      "Messages": [
         {
-            "Role": "Assistant",
-            "Content": "I'm good! How can I assist you today?"
+          "Role": "Assistant",
+          "Content": "I'm good! How can I assist you today?"
         }
-    ],
-    "ToolCalls": {},
-    "ToolExecutionResponses": [],
-    "FinishReason": "Stop | Length | ToolCalls | ContentFilter | TooManyRequests | Error"
-}</code></pre>
+      ],
+      "ToolCalls": {},
+      "ToolExecutionResponses": [],
+      "FinishReason": "Stop"
+    }</code></pre>
       </div>
-
+    
       <h4>3. Integrate RAG Index with Chat Requests</h4>
       <p>To enable your AI model to answer queries using information stored in a RAG index, follow these steps:</p>
-
+    
       <h5>3.1 Create a RAG Index</h5>
-      <p>Use the <strong>Create RAG Index</strong> endpoint to define a new RAG index. For example, to create an index named <strong>MyRagIndex</strong>, send a POST request with the required index metadata.</p>
-      <p><strong>HTTP Request:</strong> <span class="method post">POST</span> <code>https://yourapi.com/Rag/Index</code></p>
+      <p>Use the <strong>Create RAG Index</strong> endpoint to define a new RAG index in <strong>Weaviate</strong>. For example, to create an index named <strong>MyRagIndex</strong>, send a POST request with the required index metadata. (Azure-specific fields like <code>ScoringProfile</code>, <code>IndexingInterval</code>, and <code>ChunkOverlap</code> are intentionally omitted for Weaviate.)</p>
+      <p><strong>HTTP Request:</strong> <span class="method post">POST</span> <code>https://intelligencehub-managed.azurewebsites.net/Rag/Index</code></p>
       <div class="code-block">
         <button class="copy-btn">Copy</button>
         <pre><code class="language-json">{
-    "Name": "MyRagIndex",
-    "GenerationHost": "AzureAI",
-    "RagHost": "Azure",
-    "IndexingInterval": "00:05:00",
-    "EmbeddingModel": "ada-text-embedding-002",
-    "MaxRagAttachments": 10,
-    "ChunkOverlap": 0.2,
-    "ScoringProfile": {
-        "Name": "DefaultScoring",
-        "SearchAggregation": "Sum",
-        "SearchInterpolation": "Linear",
-        "FreshnessBoost": 1.0,
-        "BoostDurationDays": 7,
-        "TagBoost": 1.5,
-        "Weights": {
-            "field1": 0.8,
-            "field2": 1.2
-        }
-    },
-    "GenerateKeywords": true,
-    "GenerateTopic": false
-}</code></pre>
+      "Name": "MyRagIndex",
+      "RagHost": "Weaviate",
+      "GenerationHost": "OpenAI",
+      "EmbeddingModel": "text-embedding-3-large",
+      "MaxRagAttachments": 10,
+      "GenerateKeywords": true,
+      "GenerateTopic": false
+    }</code></pre>
       </div>
       <div class="code-block">
         <button class="copy-btn">Copy</button>
-        <pre><code class="language-bash">curl -X POST "https://yourapi.com/Rag/Index" \
-     -H "Content-Type: application/json" \
-     -d '{
-           "Name": "MyRagIndex",
-           "GenerationHost": "AzureAI",
-           "RagHost": "Azure",
-           "IndexingInterval": "00:05:00",
-           "EmbeddingModel": "ada-text-embedding-002",
-           "MaxRagAttachments": 10,
-           "ChunkOverlap": 0.2,
-           "ScoringProfile": {
-               "Name": "DefaultScoring",
-               "SearchAggregation": "Sum",
-               "SearchInterpolation": "Linear",
-               "FreshnessBoost": 1.0,
-               "BoostDurationDays": 7,
-               "TagBoost": 1.5,
-               "Weights": {
-                   "field1": 0.8,
-                   "field2": 1.2
-               }
-           },
-           "GenerateKeywords": true,
-           "GenerateTopic": false
-         }'</code></pre>
+        <pre><code class="language-bash">curl -X POST "https://intelligencehub-managed.azurewebsites.net/Rag/Index" \
+      -H "X-Api-Key: &lt;your_api_key&gt;" \
+      -H "Content-Type: application/json" \
+      -d '{
+            "Name": "MyRagIndex",
+            "RagHost": "Weaviate",
+            "GenerationHost": "OpenAI",
+            "EmbeddingModel": "text-embedding-3-large",
+            "MaxRagAttachments": 10,
+            "GenerateKeywords": true,
+            "GenerateTopic": false
+          }'</code></pre>
       </div>
       <p>A successful request will return the index metadata for <strong>MyRagIndex</strong>.</p>
-
+    
       <h5>3.2 Add a New Document to the RAG Index</h5>
       <p>After creating the index, add or update documents using the <strong>Upsert Documents</strong> endpoint.</p>
-      <p><strong>HTTP Request:</strong> <span class="method post">POST</span> <code>https://yourapi.com/Rag/index/MyRagIndex/Document</code></p>
+      <p><strong>HTTP Request:</strong> <span class="method post">POST</span> <code>https://intelligencehub-managed.azurewebsites.net/Rag/index/MyRagIndex/Document</code></p>
       <div class="code-block">
         <button class="copy-btn">Copy</button>
         <pre><code class="language-json">{
-    "Documents": [
+      "Documents": [
         {
-            "Title": "Azure AI Overview",
-            "Content": "Detailed information on Azure AI Search Services and its capabilities...",
-            "Topic": "Azure",
-            "Keywords": "AI, Search, Azure",
-            "Source": "Official Documentation"
+          "Title": "Weaviate Overview",
+          "Content": "Detailed information on the Weaviate vector database, hybrid search, and schema design...",
+          "Topic": "Weaviate",
+          "Keywords": "Weaviate, vector database, hybrid search, semantic",
+          "Source": "Weaviate Documentation"
         }
-    ]
-}</code></pre>
+      ]
+    }</code></pre>
       </div>
       <div class="code-block">
         <button class="copy-btn">Copy</button>
-        <pre><code class="language-bash">curl -X POST "https://yourapi.com/Rag/index/MyRagIndex/Document" \
-     -H "Content-Type: application/json" \
-     -d '{
-           "Documents": [
-               {
-                   "Title": "Azure AI Overview",
-                   "Content": "Detailed information on Azure AI Search Services and its capabilities...",
-                   "Topic": "Azure",
-                   "Keywords": "AI, Search, Azure",
-                   "Source": "Official Documentation"
-               }
-           ]
-         }'</code></pre>
+        <pre><code class="language-bash">curl -X POST "https://intelligencehub-managed.azurewebsites.net/Rag/index/MyRagIndex/Document" \
+      -H "X-Api-Key: &lt;your_api_key&gt;" \
+      -H "Content-Type: application/json" \
+      -d '{
+            "Documents": [
+              {
+                "Title": "Weaviate Overview",
+                "Content": "Detailed information on the Weaviate vector database, hybrid search, and schema design...",
+                "Topic": "Weaviate",
+                "Keywords": "Weaviate, vector database, hybrid search, semantic",
+                "Source": "Weaviate Documentation"
+              }
+            ]
+          }'</code></pre>
       </div>
       <p>This request will upsert the document into <strong>MyRagIndex</strong>.</p>
-
+    
       <h5>3.3 Run an Update on the RAG Index</h5>
       <p>Once you have added new content, refresh the RAG index by initiating an update run.</p>
-      <p><strong>HTTP Request:</strong> <span class="method post">POST</span> <code>https://yourapi.com/Rag/Index/MyRagIndex/Run</code></p>
+      <p><strong>HTTP Request:</strong> <span class="method post">POST</span> <code>https://intelligencehub-managed.azurewebsites.net/Rag/Index/MyRagIndex/Run</code></p>
       <div class="code-block">
         <button class="copy-btn">Copy</button>
-        <pre><code class="language-bash">curl -X POST "https://yourapi.com/Rag/Index/MyRagIndex/Run"</code></pre>
+        <pre><code class="language-bash">curl -X POST "https://intelligencehub-managed.azurewebsites.net/Rag/Index/MyRagIndex/Run" \
+      -H "X-Api-Key: &lt;your_api_key&gt;"</code></pre>
       </div>
       <p>A successful update will return a <code>204 No Content</code> status, indicating that the index update process has started.</p>
-
+    
       <h5>3.4 Make a Chat Request with RAG Database Integration</h5>
       <p>Finally, to leverage the RAG index during chat interactions, include the <code>RagDatabase</code> property in the <code>ProfileOptions</code> of your chat request. This tells the AI model to retrieve and use the context from <strong>MyRagIndex</strong>.</p>
-      <p><strong>HTTP Request:</strong> <span class="method post">POST</span> <code>https://yourapi.com/Completion/Chat/ChatProfile</code></p>
+      <p><strong>HTTP Request:</strong> <span class="method post">POST</span> <code>https://intelligencehub-managed.azurewebsites.net/Completion/Chat/ChatProfile</code></p>
       <div class="code-block">
         <button class="copy-btn">Copy</button>
         <pre><code class="language-json">{
-    "ConversationId": "d290f1ee-6c54-4b01-90e6-d701748f0851",
-    "ProfileOptions": {
+      "ConversationId": "d290f1ee-6c54-4b01-90e6-d701748f0851",
+      "ProfileOptions": {
         "Name": "ChatProfile",
         "Model": "gpt-4o",
         "Host": "OpenAI",
         "Temperature": 0.7,
         "MaxTokens": 150,
         "RagDatabase": "MyRagIndex"
-    },
-    "Messages": [
+      },
+      "Messages": [
         {
-            "Role": "User",
-            "Content": "Can you tell me about Azure AI Services?"
+          "Role": "User",
+          "Content": "Can you explain Weaviate's hybrid search?"
         }
-    ]
-}</code></pre>
+      ]
+    }</code></pre>
       </div>
       <div class="code-block">
         <button class="copy-btn">Copy</button>
-        <pre><code class="language-bash">curl -X POST "https://yourapi.com/Completion/Chat/ChatProfile" \
-     -H "Authorization: Bearer {token}" \
-     -H "Content-Type: application/json" \
-     -d '{
-           "ConversationId": "d290f1ee-6c54-4b01-90e6-d701748f0851",
-           "ProfileOptions": {
-               "Name": "ChatProfile",
-               "Model": "gpt-4o",
-               "Host": "OpenAI",
-               "Temperature": 0.7,
-               "MaxTokens": 150,
-               "RagDatabase": "MyRagIndex"
-           },
-           "Messages": [
-               {
-                   "Role": "User",
-                   "Content": "Can you tell me about Azure AI Services?"
-               }
-           ]
-         }'</code></pre>
+        <pre><code class="language-bash">curl -X POST "https://intelligencehub-managed.azurewebsites.net/Completion/Chat/ChatProfile" \
+      -H "X-Api-Key: &lt;your_api_key&gt;" \
+      -H "Content-Type: application/json" \
+      -d '{
+            "ConversationId": "d290f1ee-6c54-4b01-90e6-d701748f0851",
+            "ProfileOptions": {
+              "Name": "ChatProfile",
+              "Model": "gpt-4o",
+              "Host": "OpenAI",
+              "Temperature": 0.7,
+              "MaxTokens": 150,
+              "RagDatabase": "MyRagIndex"
+            },
+            "Messages": [
+              {
+                "Role": "User",
+                "Content": "Can you explain Weaviate'\''s hybrid search?"
+              }
+            ]
+          }'</code></pre>
       </div>
       <p>When processed, the AI model will use the documents and context from <strong>MyRagIndex</strong> to provide an informed response to your query.</p>
     </section>
 
+
     <section id="api-reference">
       <h2>API Reference</h2>
+
+      <div class="callout">
+        <strong>Authentication:</strong> All endpoints require an API key sent on every request with the header
+        <code>X-Api-Key: &lt;your_api_key&gt;</code>. To generate a new key, go to the
+        <a href="https://theintelligencehub.azurewebsites.net/reference" target="_blank" rel="noopener noreferrer">API Reference</a> tab.
+      </div>
 
       <h3>Chat Completion API Reference</h3>
       <p><strong>Base URL</strong> <code>/Completion</code></p>
@@ -698,8 +677,8 @@
       <p><strong>Example Request:</strong></p>
       <div class="code-block">
         <button class="copy-btn">Copy</button>
-        <pre><code class="language-bash">curl -X POST "https://yourapi.com/Completion/Chat/ChatProfile" \
-  -H "Authorization: Bearer {token}" \
+        <pre><code class="language-bash">curl -X POST "https://intelligencehub-managed.azurewebsites.net/Completion/Chat/ChatProfile" \
+  -H "X-Api-Key: {your_api_key}" \
   -H "Content-Type: application/json" \
   -d '{  "ConversationId": "d290f1ee-6c54-4b01-90e6-d701748f0851", "ProfileOptions": { "Name": "ChatProfile", "Model": "gpt-4o", "Host": "OpenAI", "Temperature": 0.7, "MaxTokens": 150 }, "Messages": [ { "Role": "User", "Content": "Hello, how are you?" } ] }'</code></pre>
       </div>
@@ -744,8 +723,8 @@
       <p><strong>Example Request:</strong></p>
       <div class="code-block">
         <button class="copy-btn">Copy</button>
-        <pre><code class="language-bash">curl -X POST "https://yourapi.com/Completion/SSE/ChatProfile" \
-  -H "Authorization: Bearer {token}" \
+        <pre><code class="language-bash">curl -X POST "https://intelligencehub-managed.azurewebsites.net/Completion/SSE/ChatProfile" \
+  -H "X-Api-Key: {your_api_key}" \
   -H "Content-Type: application/json" \
   -N \
   -d '{ "ProfileOptions": { "Name": "ChatProfile", "Model": "gpt-4o", "Host": "OpenAI", "Temperature": 0.7, "MaxTokens": 150 }, "Messages": [ { "Role": "User", "Content": "Hello, stream my response!" } ] }'</code></pre>
@@ -777,6 +756,17 @@ data: { "chunkProperty": "chunkValue", ... }</code></pre>
       <h3>ChatHub (SignalR Hub)</h3>
       <p><strong>Base URL</strong> <code>/ChatStream</code></p>
       <p>The <code>ChatHub</code> is a SignalR hub designed to stream chat completion responses to connected clients.</p>
+
+      <div class="code-block">
+        <button class="copy-btn">Copy</button>
+        <pre><code class="language-csharp">// SignalR connection including API key header
+var hubConnection = new HubConnectionBuilder()
+    .WithUrl("https://intelligencehub-managed.azurewebsites.net/ChatStream", options =>
+    {
+        options.Headers.Add("X-Api-Key", "&lt;your_api_key&gt;");
+    })
+    .Build();</code></pre>
+      </div>
 
       <h4>1. Send(CompletionRequest completionRequest)</h4>
       <p><strong>Description:</strong> Sends a chat completion request and streams response chunks back to the client.</p>
@@ -815,7 +805,7 @@ var request = new CompletionRequest
         Temperature = 0.7f,  
         MaxTokens = 150   
     }, 
-    Messages = new List<Message>  
+    Messages = new List&lt;Message&gt;  
     {  
         new Message  
         { 
@@ -855,8 +845,9 @@ await hubConnection.InvokeAsync("Send", request);</code></pre>
       <p><strong>Example Request:</strong></p>
       <div class="code-block">
         <button class="copy-btn">Copy</button>
-        <pre><code class="language-bash">GET https://yourapi.com/Profile/get/ChatProfile</code></pre>
+        <pre><code class="language-bash">GET https://intelligencehub-managed.azurewebsites.net/Profile/get/ChatProfile</code></pre>
       </div>
+      <p><em>Required header:</em> <code>X-Api-Key: {your_api_key}</code></p>
       <p><strong>Example Response:</strong></p>
       <div class="code-block">
         <button class="copy-btn">Copy</button>
@@ -922,8 +913,9 @@ await hubConnection.InvokeAsync("Send", request);</code></pre>
       <p><strong>Example Request:</strong></p>
       <div class="code-block">
         <button class="copy-btn">Copy</button>
-        <pre><code class="language-bash">GET https://yourapi.com/Profile/get/all/page/1/count/10</code></pre>
+        <pre><code class="language-bash">GET https://intelligencehub-managed.azurewebsites.net/Profile/get/all/page/1/count/10</code></pre>
       </div>
+      <p><em>Required header:</em> <code>X-Api-Key: {your_api_key}</code></p>
       <p><strong>Example Response:</strong></p>
       <div class="code-block">
         <button class="copy-btn">Copy</button>
@@ -1029,7 +1021,8 @@ await hubConnection.InvokeAsync("Send", request);</code></pre>
         <li><code>500 Internal Server Error</code>: Unexpected server error.</li>
       </ul>
       <p><strong>Example Request:</strong></p>
-      <p><code>POST https://yourapi.com/Profile/upsert</code></p>
+      <p><code>POST https://intelligencehub-managed.azurewebsites.net/Profile/upsert</code></p>
+      <p><em>Required header:</em> <code>X-Api-Key: {your_api_key}</code></p>
       <p>See the request payload at <code>Completions/Chat/{profileName}</code>.</p>
       <p><strong>Example Response:</strong></p>
       <div class="code-block">
@@ -1101,7 +1094,8 @@ await hubConnection.InvokeAsync("Send", request);</code></pre>
       <p><strong>Example Request:</strong></p>
       <div class="code-block">
         <button class="copy-btn">Copy</button>
-        <pre><code class="language-bash">curl -X POST "https://yourapi.com/Profile/associate/ChatProfile" \
+        <pre><code class="language-bash">curl -X POST "https://intelligencehub-managed.azurewebsites.net/Profile/associate/ChatProfile" \
+     -H "X-Api-Key: {your_api_key}" \
      -H "Content-Type: application/json" \
      -d '["Tool1", "Tool2"]'</code></pre>
       </div>
@@ -1133,7 +1127,8 @@ await hubConnection.InvokeAsync("Send", request);</code></pre>
       <p><strong>Example Request:</strong></p>
       <div class="code-block">
         <button class="copy-btn">Copy</button>
-        <pre><code class="language-bash">curl -X POST "https://yourapi.com/Profile/dissociate/ChatProfile" \
+        <pre><code class="language-bash">curl -X POST "https://intelligencehub-managed.azurewebsites.net/Profile/dissociate/ChatProfile" \
+     -H "X-Api-Key: {your_api_key}" \
      -H "Content-Type: application/json" \
      -d '["Tool1", "Tool2"]'</code></pre>
       </div>
@@ -1160,7 +1155,8 @@ await hubConnection.InvokeAsync("Send", request);</code></pre>
       <p><strong>Example Request:</strong></p>
       <div class="code-block">
         <button class="copy-btn">Copy</button>
-        <pre><code class="language-bash">curl -X DELETE "https://yourapi.com/Profile/delete/ChatProfile"</code></pre>
+        <pre><code class="language-bash">curl -X DELETE "https://intelligencehub-managed.azurewebsites.net/Profile/delete/ChatProfile" \
+  -H "X-Api-Key: {your_api_key}"</code></pre>
       </div>
       <p><strong>Example Response:</strong> <em>No content</em></p>
 
@@ -1185,8 +1181,9 @@ await hubConnection.InvokeAsync("Send", request);</code></pre>
       <p><strong>Example Request:</strong></p>
       <div class="code-block">
         <button class="copy-btn">Copy</button>
-        <pre><code class="language-bash">GET https://yourapi.com/Tool/get/ImageProcessor</code></pre>
+        <pre><code class="language-bash">GET https://intelligencehub-managed.azurewebsites.net/Tool/get/ImageProcessor</code></pre>
       </div>
+      <p><em>Required header:</em> <code>X-Api-Key: {your_api_key}</code></p>
       <p><strong>Example Response:</strong></p>
       <div class="code-block">
         <button class="copy-btn">Copy</button>
@@ -1229,8 +1226,9 @@ await hubConnection.InvokeAsync("Send", request);</code></pre>
       <p><strong>Example Request:</strong></p>
       <div class="code-block">
         <button class="copy-btn">Copy</button>
-        <pre><code class="language-bash">GET https://yourapi.com/Tool/get/all/page/1/count/10</code></pre>
+        <pre><code class="language-bash">GET https://intelligencehub-managed.azurewebsites.net/Tool/get/all/page/1/count/10</code></pre>
       </div>
+      <p><em>Required header:</em> <code>X-Api-Key: {your_api_key}</code></p>
       <p><strong>Example Response:</strong></p>
       <div class="code-block">
         <button class="copy-btn">Copy</button>
@@ -1294,8 +1292,9 @@ await hubConnection.InvokeAsync("Send", request);</code></pre>
       <p><strong>Example Request:</strong></p>
       <div class="code-block">
         <button class="copy-btn">Copy</button>
-        <pre><code class="language-bash">GET https://yourapi.com/Tool/get/ImageProcessor/profiles</code></pre>
+        <pre><code class="language-bash">GET https://intelligencehub-managed.azurewebsites.net/Tool/get/ImageProcessor/profiles</code></pre>
       </div>
+      <p><em>Required header:</em> <code>X-Api-Key: {your_api_key}</code></p>
       <p><strong>Example Response:</strong></p>
       <div class="code-block">
         <button class="copy-btn">Copy</button>
@@ -1360,7 +1359,8 @@ await hubConnection.InvokeAsync("Send", request);</code></pre>
       <p><strong>Example Request:</strong></p>
       <div class="code-block">
         <button class="copy-btn">Copy</button>
-        <pre><code class="language-bash">curl -X POST "https://yourapi.com/Tool/upsert" \
+        <pre><code class="language-bash">curl -X POST "https://intelligencehub-managed.azurewebsites.net/Tool/upsert" \
+     -H "X-Api-Key: {your_api_key}" \
      -H "Content-Type: application/json" \
      -d '[ { "Type": "function", "Function": { "Name": "TestTool", "Description": "A tool description for example purposes. This will be sent to example.com", "Parameters": { "type": "object", "properties": { "anExampleProperty": { "type": "string", "description": "An example description of the property." } }, "required": ["anExampleProperty"] } }, "ExecutionUrl": "https://example.com", "ExecutionMethod": "POST", "ExecutionBase64Key": "A base key" } ]'</code></pre>
       </div>
@@ -1413,7 +1413,8 @@ await hubConnection.InvokeAsync("Send", request);</code></pre>
       <p><strong>Example Request:</strong></p>
       <div class="code-block">
         <button class="copy-btn">Copy</button>
-        <pre><code class="language-bash">curl -X POST "https://yourapi.com/Tool/associate/ImageProcessor" \
+        <pre><code class="language-bash">curl -X POST "https://intelligencehub-managed.azurewebsites.net/Tool/associate/ImageProcessor" \
+     -H "X-Api-Key: {your_api_key}" \
      -H "Content-Type: application/json" \
      -d '["ChatProfile", "ImageAssistant"]'</code></pre>
       </div>
@@ -1445,7 +1446,8 @@ await hubConnection.InvokeAsync("Send", request);</code></pre>
       <p><strong>Example Request:</strong></p>
       <div class="code-block">
         <button class="copy-btn">Copy</button>
-        <pre><code class="language-bash">curl -X POST "https://yourapi.com/Tool/dissociate/ImageProcessor" \
+        <pre><code class="language-bash">curl -X POST "https://intelligencehub-managed.azurewebsites.net/Tool/dissociate/ImageProcessor" \
+     -H "X-Api-Key: {your_api_key}" \
      -H "Content-Type: application/json" \
      -d '["ChatProfile", "ImageAssistant"]'</code></pre>
       </div>
@@ -1472,154 +1474,118 @@ await hubConnection.InvokeAsync("Send", request);</code></pre>
       <p><strong>Example Request:</strong></p>
       <div class="code-block">
         <button class="copy-btn">Copy</button>
-        <pre><code class="language-bash">curl -X DELETE "https://yourapi.com/Tool/delete/ImageProcessor"</code></pre>
+        <pre><code class="language-bash">curl -X DELETE "https://intelligencehub-managed.azurewebsites.net/Tool/delete/ImageProcessor" \
+  -H "X-Api-Key: {your_api_key}"</code></pre>
       </div>
       <p><strong>Example Response:</strong> <em>No content</em></p>
 
       <h3>Message History API Reference</h3>
       <p><strong>Base URL</strong> <code>/MessageHistory</code></p>
-      <p>The Message History API provides endpoints to manage message histories. You can retrieve messages, update or create a message history, delete an entire message history, add individual messages, or remove specific messages.</p>
+      <p>The Message History API provides endpoints to manage message histories. You can retrieve messages, update or create a message history, delete an entire message history, or remove specific messages.</p>
+      <p><em>All Message History requests require the <code>X-Api-Key</code> header.</em></p>
 
       <h4>1. Get Message History</h4>
-      <p><strong>HTTP Request:</strong> <span class="method get">GET</span> <code>/MessageHistory/{id}</code></p>
-      <p><strong>Description:</strong> Retrieves the message history for the specified message history identifier.</p>
+      <p><strong>HTTP Request:</strong> <span class="method get">GET</span> <code>/MessageHistory/conversation/{id}/page/{page}/count/{count}</code></p>
+      <p><strong>Description:</strong> Retrieves the message history for the specified conversation identifier.</p>
       <p><strong>Route Parameters:</strong></p>
       <ul>
-        <li><code>id</code> (string): The unique identifier for the message history.</li>
-      </ul>
-      <p><strong>Query Parameters:</strong></p>
-      <ul>
-        <li><code>count</code> (integer, required): Number of messages to retrieve.</li>
-        <li><code>page</code> (integer, required): Page offset for pagination.</li>
+        <li><code>id</code> (GUID): The unique identifier for the conversation.</li>
+        <li><code>page</code> (integer, required): Page number to retrieve (must be ≥ 1).</li>
+        <li><code>count</code> (integer, required): Number of messages to retrieve (must be ≥ 1).</li>
       </ul>
       <p><strong>Responses:</strong></p>
       <ul>
         <li><code>200 OK</code>: Returns a list of message objects.</li>
-        <li><code>400 Bad Request</code>: If parameters are invalid.</li>
+        <li><code>400 Bad Request</code>: If parameters are invalid (e.g., <code>page</code> or <code>count</code> &lt; 1).</li>
         <li><code>404 Not Found</code>: If the message history is not found.</li>
+        <li><code>500 Internal Server Error</code>: Unexpected server error.</li>
       </ul>
       <p><strong>Example Response:</strong></p>
       <div class="code-block">
         <button class="copy-btn">Copy</button>
-        <pre><code class="language-json">{
-    "status": "Ok",
-    "data": [
-        {
-            "Role": "User",
-            "Content": "Hello, how can I help you?",
-            "Base64Image": null,
-            "TimeStamp": "2025-03-05T12:34:56Z"
-        },
-        {
-            "Role": "Assistant",
-            "Content": "I need assistance with my order.",
-            "Base64Image": null,
-            "TimeStamp": "2025-03-05T12:35:10Z"
-        }
-    ]
-}</code></pre>
+        <pre><code class="language-json">[
+  {
+    "Role": "User",
+    "Content": "Hello, how can I help you?",
+    "Base64Image": null,
+    "TimeStamp": "2025-03-05T12:34:56Z"
+  },
+  {
+    "Role": "Assistant",
+    "Content": "I need assistance with my order.",
+    "Base64Image": null,
+    "TimeStamp": "2025-03-05T12:35:10Z"
+  }
+]</code></pre>
       </div>
 
       <h4>2. Update or Create Message History</h4>
-      <p><strong>HTTP Request:</strong> <span class="method post">POST</span> <code>/MessageHistory/{messageHistoryId}</code></p>
+      <p><strong>HTTP Request:</strong> <span class="method post">POST</span> <code>/MessageHistory/conversation/{id}</code></p>
       <p><strong>Description:</strong> Validates and updates (or creates) a message history by adding the provided list of messages.</p>
       <p><strong>Route Parameters:</strong></p>
       <ul>
-        <li><code>messageHistoryId</code> (string): The unique identifier for the message history.</li>
+        <li><code>id</code> (GUID): The unique identifier for the conversation.</li>
       </ul>
       <p><strong>Request Body:</strong></p>
       <div class="code-block">
         <button class="copy-btn">Copy</button>
         <pre><code class="language-json">[
-    {
-        "Role": "User",
-        "Content": "What is the status of my order?",
-        "Base64Image": null,
-        "TimeStamp": "2025-03-05T12:40:00Z"
-    },
-    {
-        "Role": "Assistant",
-        "Content": "Your order is being processed.",
-        "Base64Image": null,
-        "TimeStamp": "2025-03-05T12:41:00Z"
-    }
+  {
+    "Role": "User",
+    "Content": "What is the status of my order?",
+    "Base64Image": null,
+    "TimeStamp": "2025-03-05T12:40:00Z"
+  },
+  {
+    "Role": "Assistant",
+    "Content": "Your order is being processed.",
+    "Base64Image": null,
+    "TimeStamp": "2025-03-05T12:41:00Z"
+  }
 ]</code></pre>
       </div>
       <p><strong>Responses:</strong></p>
       <ul>
         <li><code>200 OK</code>: Returns the successfully added messages.</li>
-        <li><code>400 Bad Request</code>: Validation errors.</li>
+        <li><code>400 Bad Request</code>: Validation errors (e.g., missing or empty message list).</li>
+        <li><code>500 Internal Server Error</code>: Unexpected server error.</li>
       </ul>
 
       <h4>3. Delete Message History</h4>
-      <p><strong>HTTP Request:</strong> <span class="method delete">DELETE</span> <code>/MessageHistory/{id}</code></p>
-      <p><strong>Description:</strong> Deletes the entire message history identified by the provided ID.</p>
+      <p><strong>HTTP Request:</strong> <span class="method delete">DELETE</span> <code>/MessageHistory/conversation/{id}</code></p>
+      <p><strong>Description:</strong> Deletes the entire message history identified by the provided conversation ID.</p>
       <p><strong>Route Parameters:</strong></p>
       <ul>
-        <li><code>id</code> (string): The unique identifier for the message history.</li>
+        <li><code>id</code> (GUID): The unique identifier for the conversation.</li>
       </ul>
       <p><strong>Responses:</strong></p>
       <ul>
-        <li><code>200 OK</code>: Indicates successful deletion.</li>
+        <li><code>204 No Content</code>: Indicates successful deletion.</li>
         <li><code>404 Not Found</code>: If the message history is not found.</li>
+        <li><code>500 Internal Server Error</code>: Unexpected server error.</li>
       </ul>
-      <p><strong>Example Response:</strong></p>
-      <div class="code-block">
-        <button class="copy-btn">Copy</button>
-        <pre><code class="language-json">{
-    "status": "Ok",
-    "data": true
-}</code></pre>
-      </div>
+      <p><strong>Example Response:</strong> <em>No content</em></p>
 
-      <h4>4. Add Message to Message History</h4>
-      <p><strong>HTTP Request:</strong> <span class="method post">POST</span> <code>/MessageHistory/{messageHistoryId}/message</code></p>
-      <p><strong>Description:</strong> Adds a single message to an existing message history.</p>
-      <p><strong>Route Parameters:</strong></p>
-      <ul>
-        <li><code>messageHistoryId</code> (string): The unique identifier for the message history.</li>
-      </ul>
-      <p><strong>Request Body:</strong></p>
-      <div class="code-block">
-        <button class="copy-btn">Copy</button>
-        <pre><code class="language-json">{
-    "Role": "User",
-    "Content": "Can I update my shipping address?",
-    "Base64Image": null,
-    "TimeStamp": "2025-03-05T12:45:00Z"
-}</code></pre>
-      </div>
-      <p><strong>Responses:</strong></p>
-      <ul>
-        <li><code>200 OK</code>: Returns the newly added message.</li>
-        <li><code>404 Not Found</code>: If the message history is not found.</li>
-      </ul>
-
-      <h4>5. Delete Message from Message History</h4>
-      <p><strong>HTTP Request:</strong> <span class="method delete">DELETE</span> <code>/MessageHistory/{messageHistoryId}/message/{messageId}</code></p>
+      <h4>4. Delete Message from Message History</h4>
+      <p><strong>HTTP Request:</strong> <span class="method delete">DELETE</span> <code>/MessageHistory/conversation/{conversationId}/message/{messageId}</code></p>
       <p><strong>Description:</strong> Deletes a specific message from the message history.</p>
       <p><strong>Route Parameters:</strong></p>
       <ul>
-        <li><code>messageHistoryId</code> (string): The unique identifier for the message history.</li>
-        <li><code>messageId</code> (string): The unique identifier for the message.</li>
+        <li><code>conversationId</code> (GUID): The unique identifier for the conversation.</li>
+        <li><code>messageId</code> (integer): The unique identifier for the message.</li>
       </ul>
       <p><strong>Responses:</strong></p>
       <ul>
-        <li><code>200 OK</code>: Indicates successful deletion.</li>
-        <li><code>404 Not Found</code>: If the message history or message is not found.</li>
+        <li><code>204 No Content</code>: Indicates successful deletion.</li>
+        <li><code>404 Not Found</code>: If the conversation or message is not found.</li>
+        <li><code>500 Internal Server Error</code>: Unexpected server error.</li>
       </ul>
-      <p><strong>Example Response:</strong></p>
-      <div class="code-block">
-        <button class="copy-btn">Copy</button>
-        <pre><code class="language-json">{
-    "status": "Ok",
-    "data": true
-}</code></pre>
-      </div>
+      <p><strong>Example Response:</strong> <em>No content</em></p>
+
 
       <h3>RAG Index API Reference</h3>
       <p><strong>Base URL</strong> <code>/Rag</code></p>
-      <p>The <code>RagController</code> manages RAG indexes for Azure AI Search Services and Weaviate Cloud. This API allows you to create, configure, query, and manage RAG indexes and their documents.</p>
+      <p>The <code>RagController</code> manages RAG indexes for Azure AI Search Services and Weaviate Cloud. This API allows you to create, configure, query, and manage RAG indexes and their documents. <strong>All examples below use Weaviate</strong> and omit settings that are not supported by Weaviate.</p>
       <div class="callout">
         <strong>Weaviate Limitations:</strong>
         <ul>
@@ -1646,30 +1612,20 @@ await hubConnection.InvokeAsync("Send", request);</code></pre>
       <p><strong>Example Request:</strong></p>
       <div class="code-block">
         <button class="copy-btn">Copy</button>
-        <pre><code class="language-bash">GET https://yourapi.com/Rag/Index/MyRagIndex</code></pre>
+        <pre><code class="language-bash">GET https://intelligencehub-managed.azurewebsites.net/Rag/Index/MyRagIndex</code></pre>
       </div>
+      <p><em>Required header:</em> <code>X-Api-Key: {your_api_key}</code></p>
       <p><strong>Example Response:</strong></p>
       <div class="code-block">
         <button class="copy-btn">Copy</button>
         <pre><code class="language-json">{
     "Name": "MyRagIndex",
-    "GenerationHost": "AzureAI",
-    "IndexingInterval": "00:05:00",
-    "EmbeddingModel": "ada-text-embedding-002 | text-embedding-3-large",
+    "RagHost": "Weaviate",
+    "GenerationHost": "OpenAI",
+    "EmbeddingModel": "text-embedding-3-large",
     "MaxRagAttachments": 10,
-    "ChunkOverlap": 0.2,
-    "ScoringProfile": {
-        "Name": "DefaultScoring",
-        "SearchAggregation": "Sum | Average | Minimum | Maximum | FirstMatching",
-        "SearchInterpolation": "Linear | Constant | Quadratic | Logarithmic",
-        "FreshnessBoost": 1.0,
-        "BoostDurationDays": 7,
-        "TagBoost": 1.5,
-        "Weights": {
-            "field1": 0.8,
-            "field2": 1.2
-        }
-    }
+    "GenerateKeywords": true,
+    "GenerateTopic": false
 }</code></pre>
       </div>
 
@@ -1678,87 +1634,52 @@ await hubConnection.InvokeAsync("Send", request);</code></pre>
       <p><strong>Description:</strong> Retrieves a list of all RAG index metadata.</p>
       <p><strong>Responses:</strong></p>
       <ul>
-        <li><code>200 OK</code>: Returns a list of indexes. Schema: <code>IEnumerable<IndexMetadata></code></li>
+        <li><code>200 OK</code>: Returns a list of indexes. Schema: <code>IEnumerable&lt;IndexMetadata&gt;</code></li>
         <li><code>500 Internal Server Error</code>: Unexpected server error.</li>
       </ul>
       <p><strong>Example Request:</strong></p>
       <div class="code-block">
         <button class="copy-btn">Copy</button>
-        <pre><code class="language-bash">GET https://yourapi.com/Rag/Index/All</code></pre>
+        <pre><code class="language-bash">GET https://intelligencehub-managed.azurewebsites.net/Rag/Index/All</code></pre>
       </div>
+      <p><em>Required header:</em> <code>X-Api-Key: {your_api_key}</code></p>
       <p><strong>Example Response:</strong></p>
       <div class="code-block">
         <button class="copy-btn">Copy</button>
         <pre><code class="language-json">[
     {
         "Name": "MyRagIndex",
-        "GenerationHost": "AzureAI",
-        "IndexingInterval": "00:05:00",
-        "EmbeddingModel": "ada-text-embedding-002 | text-embedding-3-large",
+        "RagHost": "Weaviate",
+        "GenerationHost": "OpenAI",
+        "EmbeddingModel": "text-embedding-3-large",
         "MaxRagAttachments": 10,
-        "ChunkOverlap": 0.2,
-        "ScoringProfile": {
-            "Name": "DefaultScoring",
-            "SearchAggregation": "Sum | Average | Minimum | Maximum | FirstMatching",
-            "SearchInterpolation": "Linear | Constant | Quadratic | Logarithmic",
-            "FreshnessBoost": 1.0,
-            "BoostDurationDays": 7,
-            "TagBoost": 1.5,
-            "Weights": {
-                "field1": 0.8,
-                "field2": 1.2
-            }
-        }
+        "GenerateKeywords": true,
+        "GenerateTopic": false
     },
     {
         "Name": "AnotherIndex",
-        "GenerationHost": "AzureAI",
-        "IndexingInterval": "00:05:00",
-        "EmbeddingModel": "ada-text-embedding-002 | text-embedding-3-large",
+        "RagHost": "Weaviate",
+        "GenerationHost": "OpenAI",
+        "EmbeddingModel": "text-embedding-3-large",
         "MaxRagAttachments": 10,
-        "ChunkOverlap": 0.2,
-        "ScoringProfile": {
-            "Name": "SecondaryScoring",
-            "SearchAggregation": "Sum | Average | Minimum | Maximum | FirstMatching",
-            "SearchInterpolation": "Linear | Constant | Quadratic | Logarithmic",
-            "FreshnessBoost": 1.0,
-            "BoostDurationDays": 7,
-            "TagBoost": 1.5,
-            "Weights": {
-                "field1": 0.8,
-                "field2": 1.2
-            }
-        }
+        "GenerateKeywords": true,
+        "GenerateTopic": false
     }
 ]</code></pre>
       </div>
 
       <h4>3. Create RAG Index</h4>
       <p><strong>HTTP Request:</strong> <span class="method post">POST</span> <code>/Rag/Index</code></p>
-      <p><strong>Description:</strong> Creates a new RAG index in Azure AI Search Services or Weaviate Cloud using the provided index definition.</p>
+      <p><strong>Description:</strong> Creates a new RAG index in Weaviate Cloud using the provided index definition.</p>
       <p><strong>Request Body:</strong></p>
       <div class="code-block">
         <button class="copy-btn">Copy</button>
         <pre><code class="language-json">{
     "Name": "MyRagIndex",
-    "GenerationHost": "AzureAI",
-    "RagHost": "Azure",
-    "IndexingInterval": "00:05:00",
-    "EmbeddingModel": "ada-text-embedding-002",
+    "RagHost": "Weaviate",
+    "GenerationHost": "OpenAI",
+    "EmbeddingModel": "text-embedding-3-large",
     "MaxRagAttachments": 10,
-    "ChunkOverlap": 0.2,
-    "ScoringProfile": {
-        "Name": "DefaultScoring",
-        "SearchAggregation": "Sum | Average | Minimum | Maximum | FirstMatching",
-        "SearchInterpolation": "Linear | Constant | Quadratic | Logarithmic",
-        "FreshnessBoost": 1.0,
-        "BoostDurationDays": 7,
-        "TagBoost": 1.5,
-        "Weights": {
-            "field1": 0.8,
-            "field2": 1.2
-        }
-    },
     "GenerateKeywords": true,
     "GenerateTopic": false
 }</code></pre>
@@ -1774,24 +1695,10 @@ await hubConnection.InvokeAsync("Send", request);</code></pre>
         <button class="copy-btn">Copy</button>
         <pre><code class="language-json">{
     "Name": "MyRagIndex",
-    "RagHost": "Azure",
-    "GenerationHost": "AzureAI",
-    "IndexingInterval": "00:05:00",
-    "EmbeddingModel": "ada-text-embedding-002",
+    "RagHost": "Weaviate",
+    "GenerationHost": "OpenAI",
+    "EmbeddingModel": "text-embedding-3-large",
     "MaxRagAttachments": 10,
-    "ChunkOverlap": 0.2,
-    "ScoringProfile": {
-        "Name": "DefaultScoring",
-        "SearchAggregation": "Sum",
-        "SearchInterpolation": "Linear",
-        "FreshnessBoost": 1.0,
-        "BoostDurationDays": 7,
-        "TagBoost": 1.5,
-        "Weights": {
-            "field1": 0.8,
-            "field2": 1.2
-        }
-    },
     "GenerateKeywords": true,
     "GenerateTopic": false
 }</code></pre>
@@ -1809,24 +1716,10 @@ await hubConnection.InvokeAsync("Send", request);</code></pre>
         <button class="copy-btn">Copy</button>
         <pre><code class="language-json">{
     "Name": "MyRagIndex",
-    "GenerationHost": "AzureAI",
-    "RagHost": "Azure",
-    "IndexingInterval": "00:05:00",
-    "EmbeddingModel": "text-embedding-3-large | ada-text-embedding-002",
+    "RagHost": "Weaviate",
+    "GenerationHost": "OpenAI",
+    "EmbeddingModel": "text-embedding-3-large",
     "MaxRagAttachments": 10,
-    "ChunkOverlap": 0.2,
-    "ScoringProfile": {
-        "Name": "DefaultScoring",
-        "SearchAggregation": "Sum | Average | Minimum | Maximum | FirstMatching",
-        "SearchInterpolation": "Linear | Constant | Quadratic | Logarithmic",
-        "FreshnessBoost": 1.0,
-        "BoostDurationDays": 7,
-        "TagBoost": 1.5,
-        "Weights": {
-            "field1": 0.8,
-            "field2": 1.2
-        }
-    },
     "GenerateKeywords": true,
     "GenerateTopic": false
 }</code></pre>
@@ -1843,24 +1736,10 @@ await hubConnection.InvokeAsync("Send", request);</code></pre>
         <button class="copy-btn">Copy</button>
         <pre><code class="language-json">{
     "Name": "MyRagIndex",
-    "RagHost": "Azure",
-    "GenerationHost": "AzureAI",
-    "IndexingInterval": "00:05:00",
+    "RagHost": "Weaviate",
+    "GenerationHost": "OpenAI",
     "EmbeddingModel": "text-embedding-3-large",
     "MaxRagAttachments": 10,
-    "ChunkOverlap": 0.2,
-    "ScoringProfile": {
-        "Name": "DefaultScoring",
-        "SearchAggregation": "Sum",
-        "SearchInterpolation": "Linear",
-        "FreshnessBoost": 1.0,
-        "BoostDurationDays": 7,
-        "TagBoost": 1.5,
-        "Weights": {
-            "field1": 0.8,
-            "field2": 1.2
-        }
-    },
     "GenerateKeywords": true,
     "GenerateTopic": false
 }</code></pre>
@@ -1884,8 +1763,9 @@ await hubConnection.InvokeAsync("Send", request);</code></pre>
       <p><strong>Example Request:</strong></p>
       <div class="code-block">
         <button class="copy-btn">Copy</button>
-        <pre><code class="language-bash">GET https://yourapi.com/Rag/Index/MyRagIndex/Query/azure</code></pre>
+        <pre><code class="language-bash">GET https://intelligencehub-managed.azurewebsites.net/Rag/Index/MyRagIndex/Query/azure</code></pre>
       </div>
+      <p><em>Required header:</em> <code>X-Api-Key: {your_api_key}</code></p>
       <p><strong>Example Response:</strong></p>
       <div class="code-block">
         <button class="copy-btn">Copy</button>
@@ -1918,7 +1798,8 @@ await hubConnection.InvokeAsync("Send", request);</code></pre>
       <p><strong>Example Request:</strong></p>
       <div class="code-block">
         <button class="copy-btn">Copy</button>
-        <pre><code class="language-bash">curl -X POST "https://yourapi.com/Rag/Index/MyRagIndex/Run"</code></pre>
+        <pre><code class="language-bash">curl -X POST "https://intelligencehub-managed.azurewebsites.net/Rag/Index/MyRagIndex/Run" \
+  -H "X-Api-Key: {your_api_key}"</code></pre>
       </div>
 
       <h4>7. Delete RAG Index</h4>
@@ -1938,7 +1819,8 @@ await hubConnection.InvokeAsync("Send", request);</code></pre>
       <p><strong>Example Request:</strong></p>
       <div class="code-block">
         <button class="copy-btn">Copy</button>
-        <pre><code class="language-bash">curl -X DELETE "https://yourapi.com/Rag/Index/Delete/MyRagIndex"</code></pre>
+        <pre><code class="language-bash">curl -X DELETE "https://intelligencehub-managed.azurewebsites.net/Rag/Index/Delete/MyRagIndex" \
+  -H "X-Api-Key: {your_api_key}"</code></pre>
       </div>
 
       <h4>8. Get All Documents in a RAG Index</h4>
@@ -1952,15 +1834,16 @@ await hubConnection.InvokeAsync("Send", request);</code></pre>
       </ul>
       <p><strong>Responses:</strong></p>
       <ul>
-        <li><code>200 OK</code>: Returns a collection of documents. Schema: <code>IEnumerable<IndexDocument></code></li>
+        <li><code>200 OK</code>: Returns a collection of documents. Schema: <code>IEnumerable&lt;IndexDocument&gt;</code></li>
         <li><code>400 Bad Request</code>: If pagination parameters or index name are invalid.</li>
         <li><code>500 Internal Server Error</code>: Unexpected server error.</li>
       </ul>
       <p><strong>Example Request:</strong></p>
       <div class="code-block">
         <button class="copy-btn">Copy</button>
-        <pre><code class="language-bash">GET https://yourapi.com/Rag/Index/MyRagIndex/Document/10/Page/1</code></pre>
+        <pre><code class="language-bash">GET https://intelligencehub-managed.azurewebsites.net/Rag/Index/MyRagIndex/Document/10/Page/1</code></pre>
       </div>
+      <p><em>Required header:</em> <code>X-Api-Key: {your_api_key}</code></p>
       <p><strong>Example Response:</strong></p>
       <div class="code-block">
         <button class="copy-btn">Copy</button>
@@ -1973,7 +1856,8 @@ await hubConnection.InvokeAsync("Send", request);</code></pre>
         "Title": "Getting Started with Azure AI",
         "Content": "An introductory guide..."
     }
-</code></pre>
+]</code></pre>
+      </div>
 <!-- Continuing from the last RAG Index endpoint -->
 
       <h4>9. Get Document from RAG Index</h4>
@@ -1994,8 +1878,9 @@ await hubConnection.InvokeAsync("Send", request);</code></pre>
       <p><strong>Example Request:</strong></p>
       <div class="code-block">
         <button class="copy-btn">Copy</button>
-        <pre><code class="language-bash">GET https://yourapi.com/Rag/Index/MyRagIndex/document/AzureAIOverview</code></pre>
+        <pre><code class="language-bash">GET https://intelligencehub-managed.azurewebsites.net/Rag/Index/MyRagIndex/document/AzureAIOverview</code></pre>
       </div>
+      <p><em>Required header:</em> <code>X-Api-Key: {your_api_key}</code></p>
       <p><strong>Example Response:</strong></p>
       <div class="code-block">
         <button class="copy-btn">Copy</button>
@@ -2065,17 +1950,34 @@ await hubConnection.InvokeAsync("Send", request);</code></pre>
       <p><strong>Example Request:</strong></p>
       <div class="code-block">
         <button class="copy-btn">Copy</button>
-        <pre><code class="language-bash">DELETE https://yourapi.com/Rag/index/MyRagIndex/Document/Doc1,Doc2</code></pre>
+        <pre><code class="language-bash">DELETE https://intelligencehub-managed.azurewebsites.net/Rag/index/MyRagIndex/Document/Doc1,Doc2</code></pre>
       </div>
+      <p><em>Required header:</em> <code>X-Api-Key: {your_api_key}</code></p>
       <p><strong>Example Response:</strong></p>
       <div class="code-block">
         <button class="copy-btn">Copy</button>
         <pre><code class="language-json">2</code></pre>
       </div>
     </section>
+
     <section id="contact">
       <h2>Contact</h2>
-      <p>For any questions, comments, or concerns, please reach out to <a href="mailto:Applied.AI.Help@gmail.com">Applied.AI.Help@gmail.com</a>, or open an issue in the repository.</p>
+      <div class="contact-buttons">
+        <a href="mailto:applied.ai.help@gmail.com" class="secondary-btn">
+          Email Us @ applied.ai.help@gmail.com
+        </a>
+        <a href="tel:+16308802110" class="secondary-btn">
+          Call Us @ (630) 880-2110
+        </a>
+        <a
+          href="https://appliedai-org.github.io/homepage/"
+          target="_blank"
+          rel="noopener noreferrer"
+          class="secondary-btn"
+        >
+          Visit&nbsp;Our&nbsp;Website
+        </a>
+      </div>
     </section>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js"></script>
   <script>
@@ -2101,6 +2003,22 @@ await hubConnection.InvokeAsync("Send", request);</code></pre>
         });
       });
     });
+
+    (function initBanner() {
+  if (localStorage.getItem('ihubHideTopBanner') === '1') {
+    document.body.classList.remove('has-banner');
+    const b = document.getElementById('top-banner');
+    if (b) b.style.display = 'none';
+  } else {
+    document.body.classList.add('has-banner');
+  }
+})();
+function dismissBanner() {
+  localStorage.setItem('ihubHideTopBanner', '1');
+  document.body.classList.remove('has-banner');
+  const b = document.getElementById('top-banner');
+  if (b) b.style.display = 'none';
+}
   </script>
 </body>
 </html>

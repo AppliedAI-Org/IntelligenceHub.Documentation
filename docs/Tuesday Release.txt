@@ -1,0 +1,117 @@
+Tuesday Release:
+- managed service
+	- Testing
+		- chat hub
+			- tenant
+			- anthropic, openai, azure
+			- weaviate works
+			- tools
+
+- Managed Service Front end
+	- add testing/configuration UI
+		- Fix message display
+			- no overflow for y axis scroll bar
+			- send requests successfully
+		- Finish config screen
+			- test tools
+				- save
+				- load
+				- modify
+				- use in chat
+			- test RAG
+				- save
+				- load
+				- modify
+				- use in chat
+			- Add separate tab for RAG
+			- upsert documents
+			- add validation for literally everything
+			- drop down for models based on profile host chosen
+			- tag building for
+				- required properties
+				- reference profiles
+				- Stop
+			- Add banner for all requests
+				- success
+				- failure
+		- export json for configuration upsert
+		- export json for rag creation upsert
+		- export json for document upsert
+	- ensure documentation page is accurate and up to date
+		- valid models for different services
+		- Azure AI Search Services Only for Enterprise
+		- Auth differences 
+
+- deployment
+	- Deploy Intelligence Hub Managed Service
+		- create a dev environment for the managed service
+			- create auth0 configs
+			- Deploy App service
+			- appsettings
+			- CICD
+			- create a new SQL database and tables
+		- create a prod environment for the managed service
+			- create auth0 configs
+			- Deploy App service
+			- appsettings
+			- CICD
+			- Weaviate prod 
+			- create a new SQL database and tables
+			- Add one more Azure service if its easy enough
+	- Deploy Managed Service Front End
+		- dev
+			- Deploy app service
+			- auth0 configs
+			- stripe configs
+		- prod
+			- Deploy app service
+			- auth0 configs
+			- stripe configs
+
+Before September:
+
+- Improve Managed Service
+	- actually set up payment system
+		- add manage subscription button back
+		- configure stripe settings
+		- ensure stripe trigger updates UserIsPaying value
+	- add separate usage caps for rag index usage
+		- ensure you update these back from the free trial period
+	- Finish implementing Azure function changes
+		- Ensure tenant is utilized to prevent poor database overwrites
+		- Add a completion service (add after azure rerouting is completed)
+	- add missing Anthropic models
+	- Fix
+		- unit tests
+		- Align unit tests with each branch
+		- come up with a better strategy to manage multiple branches
+	- Test
+		- concurrency
+		- load testing
+
+- Improve Managed Service Front End
+	- fix the issue where the title link in the nav menu turns black instantly
+	- Ensure documentation is up to date and accurate as fuck
+		- open source
+		- managed service 
+
+- update SQL databases for lower environments (you already updated prod like a retard)
+	- add RagHost column in dev SQL database IndexMetadata and update the value to Azure for the existing data
+
+- Update cors to below for all int hub apps:
+	.SetIsOriginAllowed(_ => true).AllowAnyHeader().AllowAnyMethod().AllowCredentials();
+
+Later:
+
+- Improve Managed Service
+	- merge back to open source
+		- unit tests
+		- other stuff?
+	- weaviate udpates
+		- refactor raglogic.cs, particularly the index creation method
+		- generate multiple vectors instead of one combined one?
+		- improved configurability
+		- choose from other embedding models?
+	- Testing
+		- load testing
+
